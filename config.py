@@ -10,7 +10,6 @@ class Config:
     classe_estabilidade: str = "D"  # classe estabilidade atmosférica
     terreno: str = "R"  # R para rural, U para urbano
 
-    gerar_meshgrid_xyz: bool = True
     dimensao_eixo_x: int = 20000  # [m] inteiro >= 1 e multiplo de passo_x
     dimensao_eixo_y: int = 2500  # [m] inteiro >= 0 e multiplo de passo_y
     dimensao_eixo_z: int = 1000  # [m] inteiro >= 0 e multiplo de passo_z
