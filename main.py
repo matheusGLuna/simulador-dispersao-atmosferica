@@ -267,7 +267,12 @@ if CONFIG["plotar_heatmap_xy"]:
 
     cbar = plt.colorbar(orientation='horizontal')
     cbar.set_label(f"Concentração em {unidade}/m³")
-
+    try:
+        plt.tight_layout()
+        plt.savefig(f"heatmap_xy_z{z_corte}.png", dpi=150)
+    except Exception as e:
+        print(f"Falha ao salvar heatmap_xy: {e}")
+        
 if CONFIG["plotar_heatmap_yz"]:
 # =============================================================================
 # Plota um heatmap 2D a uma distancia y de corte desejada
@@ -324,6 +329,11 @@ if CONFIG["plotar_heatmap_yz"]:
 
     cbar = plt.colorbar(orientation='horizontal')
     cbar.set_label(f"Concentração em {unidade}/m³")
+    try:
+        plt.tight_layout()
+        plt.savefig(f"heatmap_yz_x{x_corte}.png", dpi=150)
+    except Exception as e:
+        print(f"Falha ao salvar heatmap_yz: {e}")
 
 if CONFIG["plotar_heatmap_xz"]:
 # =============================================================================
@@ -380,3 +390,10 @@ if CONFIG["plotar_heatmap_xz"]:
 
     cbar = plt.colorbar(orientation='horizontal')
     cbar.set_label(f"Concentração em {unidade}/m³")
+    try:
+        plt.tight_layout()
+        plt.savefig(f"heatmap_xz_y{y_corte}.png", dpi=150)
+    except Exception as e:
+        print(f"Falha ao salvar heatmap_xz: {e}")
+
+plt.show()
