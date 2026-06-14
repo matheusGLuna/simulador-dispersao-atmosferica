@@ -1,11 +1,13 @@
 import matplotlib.pyplot as plt
-from matplotlib.colors import PowerNorm
 import numpy as np
+
+from matplotlib.colors import PowerNorm
+from pathlib import Path
 from config import Config
     
 config = Config()
 
-def plotar_heatmap_xy(concentracoes_xyz, eixo_x, eixo_y):
+def plotar_heatmap_xy(concentracoes_xyz, eixo_x, eixo_y, evento):
     # =============================================================================
     # Plota um heatmap 2D a uma altura Z de corte desejada
     # =============================================================================
@@ -51,11 +53,11 @@ def plotar_heatmap_xy(concentracoes_xyz, eixo_x, eixo_y):
         title=f"C(x,y) no plano z =  {z_corte} m",
         xlabel="x (m)",
         ylabel="y (m)",
-        filename=f"heatmap_xy_z{z_corte}.png",
+        filename=f"heatmap_xy_z{z_corte}.e{evento}.png",
         hlines=[(0, '--', 'white')],
     )
 
-def plotar_heatmap_yz(concentracoes_xyz, eixo_y, eixo_z):
+def plotar_heatmap_yz(concentracoes_xyz, eixo_y, eixo_z, evento):
     # =============================================================================
     # Plota um heatmap 2D a uma distancia y de corte desejada
     # =============================================================================
@@ -101,12 +103,12 @@ def plotar_heatmap_yz(concentracoes_xyz, eixo_y, eixo_z):
         title=f"C(y,z) no plano x = {x_corte} m",
         xlabel="y (m)",
         ylabel="z (m)",
-        filename=f"heatmap_yz_x{x_corte}.png",
+        filename=f"heatmap_yz_x{x_corte}.e{evento}.png",
         hlines=[(config.altura_chamine, '--', 'white')],
         vlines=[(0, '--', 'white')],
     )
 
-def plotar_heatmap_xz(concentracoes_xyz, eixo_x, eixo_z):
+def plotar_heatmap_xz(concentracoes_xyz, eixo_x, eixo_z, evento):
     # =============================================================================
     # Plota um heatmap 2D a uma distancia y de corte desejada
     # =============================================================================
@@ -152,7 +154,7 @@ def plotar_heatmap_xz(concentracoes_xyz, eixo_x, eixo_z):
         title=f"C(x,z) no plano y = {y_corte} m",
         xlabel="x (m)",
         ylabel="z (m)",
-        filename=f"heatmap_xz_y{y_corte}.png",
+        filename=f"heatmap_xz_y{y_corte}.e{evento}.png",
         aspect=4,
         hlines=[(config.altura_chamine, '--', 'white')],
     )
@@ -191,9 +193,19 @@ def render_heatmap(
     cbar = plt.colorbar(orientation='horizontal')
     cbar.set_label(f"Concentração em {config.unidade}/m³")
 
+    output_dir = (
+        Path("resultados_plotados")
+        / f"s{config.seed}"
+    )
+
+    output_dir.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
     try:
         plt.tight_layout()
-        plt.savefig(filename, dpi=150)
+        plt.savefig(output_dir/filename, dpi=150)
     except Exception as e:
         print(f"Falha ao salvar {filename}: {e}")
 

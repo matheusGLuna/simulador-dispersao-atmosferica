@@ -8,7 +8,7 @@ class GaussianPlumeModel:
     def __init__(self, config: Config):
         self.config = config
 
-    def gerar_meshgrid_xyz(self):
+    def gerar_meshgrid_xyz(self, velocidade_vento, taxa_emissao, classe_estabilidade):
         x_max = self.config.dimensao_eixo_x
         x_step = self.config.passo_x
         y_max = self.config.dimensao_eixo_y
@@ -36,14 +36,14 @@ class GaussianPlumeModel:
         z_vals = np.linspace(0, z_max, num_z)
 
         X, Y, Z = np.meshgrid(x_vals, y_vals, z_vals, indexing='ij')
-        return self.calcular_concentracao(X, Y, Z), x_vals, y_vals, z_vals
+        return self.calcular_concentracao(X, Y, Z, velocidade_vento, taxa_emissao, classe_estabilidade), x_vals, y_vals, z_vals
 
-    def calcular_concentracao(self, X, Y, Z):
-        sigma_y = self.calcular_sigma_y(X)
-        sigma_z = self.calcular_sigma_z(X)
+    def calcular_concentracao(self, X, Y, Z, velocidade_vento, taxa_emissao, classe_estabilidade):
+        sigma_y = self.calcular_sigma_y(X, classe_estabilidade)
+        sigma_z = self.calcular_sigma_z(X, classe_estabilidade)
 
-        fator = self.config.taxa_emissao_fonte / (
-            2 * math.pi * self.config.velocidade_vento * sigma_y * sigma_z
+        fator = taxa_emissao / (
+            2 * math.pi * velocidade_vento * sigma_y * sigma_z
         )
 
         expo1 = -(
@@ -58,8 +58,8 @@ class GaussianPlumeModel:
 
         return fator * (np.exp(expo1) + np.exp(expo2))
 
-    def calcular_sigma_y(self, x):
-        classe = self.config.classe_estabilidade.upper()
+    def calcular_sigma_y(self, x, classe_estabilidade):
+        classe = classe_estabilidade.upper()
         terreno = self.config.terreno.upper()
 
         if terreno == 'R':
@@ -92,8 +92,8 @@ class GaussianPlumeModel:
 
         raise ValueError("Terreno inválido: use 'R' (rural) ou 'U' (urbano)")
 
-    def calcular_sigma_z(self, x):
-        classe = self.config.classe_estabilidade.upper()
+    def calcular_sigma_z(self, x, classe_estabilidade):
+        classe = classe_estabilidade.upper()
         terreno = self.config.terreno.upper()
 
         if terreno == 'R':
