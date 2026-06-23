@@ -8,11 +8,11 @@ class Config:
     vento_min: int = 4 	            #[m/s]
     vento_max: int = 6	            #[m/s]
 
-    emissao_min: int = 200	        #[Ci total por evento, ou seja, jato puff discreto]
-    emissao_max: int = 400	        #[Ci total por evento, ou seja, jato puff discreto]
+    emissao_min: int = 50	        #[Ci/s minimo para um evento discreto]
+    emissao_max: int = 150	        #[Ci/s máximo para um evento discreto]
 
     seed: int = 42
-    total_eventos: int = 3	        #[h]
+    total_eventos: int = 6	        #[eventos]
     intervalo_evento: int = 1	    #[h]
 
     altura_chamine: int = 100       # [m]

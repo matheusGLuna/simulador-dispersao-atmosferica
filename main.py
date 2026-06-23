@@ -41,6 +41,8 @@ if __name__ == "__main__":
             scenario.obter_taxa_emissao(evento)
         )
 
+        taxa_emissao = 100 # Temporario para teste - sobrepondo com taxa fixa
+
         classe_estabilidade = (
             scenario.obter_classe_estabilidade(
                 evento,
