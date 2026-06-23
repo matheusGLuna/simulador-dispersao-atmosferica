@@ -8,12 +8,16 @@ class Config:
     vento_min: int = 4 	            #[m/s]
     vento_max: int = 6	            #[m/s]
 
-    emissao_min: int = 50	        #[Ci/s minimo para um evento discreto]
-    emissao_max: int = 150	        #[Ci/s máximo para um evento discreto]
+    emissao_min: int = 50	        #[Ci/h minimo para um evento discreto]
+    emissao_max: int = 150	        #[Ci/h máximo para um evento discreto]
+    emissao_media: int = 100        #[Ci/h médio para o acidente simulado]
 
     seed: int = 42
     total_eventos: int = 6	        #[eventos]
     intervalo_evento: int = 1	    #[h]
+    diretorio_dados: str = "dados_simulacao"
+    diretorio_campos_modelados: str = "campos_modelados"
+    diretorio_resultados_plotados: str = "resultados_plotados"
 
     altura_chamine: int = 100       # [m]
     terreno: str = "R"              # R para rural, U para urbano

@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Generated atmospheric dispersion fields
+dados_simulacao/

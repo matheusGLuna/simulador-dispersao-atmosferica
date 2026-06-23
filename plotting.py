@@ -194,8 +194,9 @@ def render_heatmap(
     cbar.set_label(f"Concentração em {config.unidade}/m³")
 
     output_dir = (
-        Path("resultados_plotados")
+        Path(config.diretorio_dados)
         / f"s{config.seed}"
+        / config.diretorio_resultados_plotados
     )
 
     output_dir.mkdir(

@@ -1,3 +1,7 @@
+from pathlib import Path
+
+import numpy as np
+
 from config import Config
 from model import GaussianPlumeModel
 from temporal_model import TemporalScenario
@@ -30,6 +34,13 @@ if __name__ == "__main__":
         )
 
     plotagem_realizada = False
+    concentracoes_xyz = None
+    diretorio_dados = (
+        Path(config.diretorio_dados)
+        / f"s{config.seed}"
+        / config.diretorio_campos_modelados
+    )
+    diretorio_dados.mkdir(parents=True, exist_ok=True)
 
     for evento in range(config.total_eventos):
 
@@ -41,7 +52,7 @@ if __name__ == "__main__":
             scenario.obter_taxa_emissao(evento)
         )
 
-        taxa_emissao = 100 # Temporario para teste - sobrepondo com taxa fixa
+        taxa_emissao = config.emissao_media
 
         classe_estabilidade = (
             scenario.obter_classe_estabilidade(
@@ -50,10 +61,8 @@ if __name__ == "__main__":
             )
         )
 
-        classe_estabilidade = 'C'  # Temporario para teste - sobrepondo com classe fixa
-
         (
-            concentracoes_xyz,
+            concentracoes_evento_xyz,
             eixo_x,
             eixo_y,
             eixo_z
@@ -62,20 +71,48 @@ if __name__ == "__main__":
             taxa_emissao,
             classe_estabilidade
         )
+
+        if concentracoes_xyz is None:
+            concentracoes_xyz = np.zeros_like(concentracoes_evento_xyz)
+
+        np.add(
+            concentracoes_xyz,
+            concentracoes_evento_xyz,
+            out=concentracoes_xyz
+        )
+
+        arquivo_evento = diretorio_dados / f"evento_{evento:04d}.npz"
+        np.savez_compressed(
+            arquivo_evento,
+            concentracoes_xyz=concentracoes_evento_xyz,
+            eixo_x=eixo_x,
+            eixo_y=eixo_y,
+            eixo_z=eixo_z,
+            evento=evento,
+            velocidade_vento=velocidade_vento,
+            taxa_emissao=taxa_emissao,
+            classe_estabilidade=classe_estabilidade
+        )
         
         if config.plotar_heatmap_xy:
-            plotting.plotar_heatmap_xy(concentracoes_xyz, eixo_x, eixo_y, evento)
+            plotting.plotar_heatmap_xy(concentracoes_evento_xyz, eixo_x, eixo_y, evento)
             plotagem_realizada = True
 
         if config.plotar_heatmap_yz:
-            plotting.plotar_heatmap_yz(concentracoes_xyz, eixo_y, eixo_z, evento)
+            plotting.plotar_heatmap_yz(concentracoes_evento_xyz, eixo_y, eixo_z, evento)
             plotagem_realizada = True
 
         if config.plotar_heatmap_xz:
-            plotting.plotar_heatmap_xz(concentracoes_xyz, eixo_x, eixo_z, evento)
+            plotting.plotar_heatmap_xz(concentracoes_evento_xyz, eixo_x, eixo_z, evento)
             plotagem_realizada = True
 
-        print(f"meshgrid de concentrações C(x,y,z) modelado com sucesso para o evento {evento}\n")
+        print(
+            f"meshgrid de concentrações C(x,y,z) modelado e salvo com sucesso "
+            f"para o evento {evento}\n"
+        )
+
+    if concentracoes_xyz is not None:
+        print("Campo resultante acumulado com sucesso\n")
 
     if plotagem_realizada:
         plotting.show_heatmap()
