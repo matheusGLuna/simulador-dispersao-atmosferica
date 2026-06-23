@@ -13,32 +13,11 @@ if __name__ == "__main__":
     model = GaussianPlumeModel(config)
     scenario = TemporalScenario(config)
 
-    if config.calcular_ponto_especifico:
-            
-        x_particular = abs(config.x_calculo)
-        y_particular = abs(config.y_calculo)
-        z_particular = abs(config.z_calculo)
-
-        concentracao = model.calcular_concentracao(
-            x_particular,
-            y_particular,
-            z_particular,
-            velocidade_vento=config.vento_calculo_fixo,
-            taxa_emissao=config.emissao_calculo_fixa,
-            classe_estabilidade=config.classe_estabilidade_calculo_fixa
-        )
-
-        print(
-            f"No ponto solicitado: C({x_particular},{y_particular},{z_particular}) = "
-            f"{concentracao:.3e} {config.unidade}/m³\n"
-        )
-
-    plotagem_realizada = False
     concentracoes_xyz = None
     diretorio_dados = (
-        Path(config.diretorio_dados)
+        Path(config.diretorio_dados_parciais)
         / f"s{config.seed}"
-        / config.diretorio_campos_modelados
+        / config.diretorio_campos_parciais
     )
     diretorio_dados.mkdir(parents=True, exist_ok=True)
 
@@ -51,8 +30,6 @@ if __name__ == "__main__":
         taxa_emissao = (
             scenario.obter_taxa_emissao(evento)
         )
-
-        taxa_emissao = config.emissao_media
 
         classe_estabilidade = (
             scenario.obter_classe_estabilidade(
@@ -81,7 +58,7 @@ if __name__ == "__main__":
             out=concentracoes_xyz
         )
 
-        arquivo_evento = diretorio_dados / f"evento_{evento:04d}.npz"
+        arquivo_evento = diretorio_dados / f"evento_{evento:02d}.npz"
         np.savez_compressed(
             arquivo_evento,
             concentracoes_xyz=concentracoes_evento_xyz,
@@ -93,27 +70,50 @@ if __name__ == "__main__":
             taxa_emissao=taxa_emissao,
             classe_estabilidade=classe_estabilidade
         )
-        
+
+        print(f"meshgrid de concentrações C(x,y,z) modelado com sucesso para o evento {evento}\n")
+
         if config.plotar_heatmap_xy:
-            plotting.plotar_heatmap_xy(concentracoes_evento_xyz, eixo_x, eixo_y, evento)
-            plotagem_realizada = True
+            plotting.plotar_heatmap_xy(
+                concentracoes_evento_xyz,
+                eixo_x,
+                eixo_y,
+                evento,
+                exibir_maximo=False,
+                campo_acumulado=False
+            )
 
         if config.plotar_heatmap_yz:
-            plotting.plotar_heatmap_yz(concentracoes_evento_xyz, eixo_y, eixo_z, evento)
-            plotagem_realizada = True
+            plotting.plotar_heatmap_yz(
+                concentracoes_evento_xyz,
+                eixo_y,
+                eixo_z,
+                evento,
+                exibir_maximo=False,
+                campo_acumulado=False
+            )
 
         if config.plotar_heatmap_xz:
-            plotting.plotar_heatmap_xz(concentracoes_evento_xyz, eixo_x, eixo_z, evento)
-            plotagem_realizada = True
-
-        print(
-            f"meshgrid de concentrações C(x,y,z) modelado e salvo com sucesso "
-            f"para o evento {evento}\n"
-        )
+            plotting.plotar_heatmap_xz(
+                concentracoes_evento_xyz,
+                eixo_x,
+                eixo_z,
+                evento,
+                exibir_maximo=False,
+                campo_acumulado=False
+            )
 
     if concentracoes_xyz is not None:
         print("Campo resultante acumulado com sucesso\n")
-
-    if plotagem_realizada:
-        plotting.show_heatmap()
-        print("Heatmaps 2D gerados com sucesso\n")
+        plotting.apresentar_maximos_cortes(
+            concentracoes_xyz,
+            eixo_x,
+            eixo_y,
+            eixo_z
+        )
+        plotting.plotar_cortes_acumulados(
+            concentracoes_xyz,
+            eixo_x,
+            eixo_y,
+            eixo_z
+        )

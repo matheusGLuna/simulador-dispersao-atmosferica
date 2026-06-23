@@ -29,8 +29,6 @@ class GaussianPlumeModel:
             )
             raise ValueError(error_string)
 
-        print(f"{total_pontos} pontos configurados para modelagem")
-
         x_vals = np.linspace(x_step, x_max, num_x)
         y_vals = np.linspace(-y_max, y_max, num_y)
         z_vals = np.linspace(0, z_max, num_z)
