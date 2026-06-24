@@ -35,15 +35,14 @@ class TemporalScenario:
 
     def obter_classe_estabilidade(
         self,
-        evento,
-        total_eventos
+        evento
     ):
         """
         Distribuição simplificada baseada
         na hora do dia.
         """
 
-        fracao = evento / total_eventos
+        fracao = evento / self.config.total_eventos
 
         # madrugada
         if fracao < 0.25:

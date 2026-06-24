@@ -1,14 +1,13 @@
-import math
 import numpy as np
-
 from config import Config
+from puff import Puff
 
-
-class GaussianPlumeModel:
+class GaussianPuffModel:
     def __init__(self, config: Config):
         self.config = config
 
-    def gerar_meshgrid_xyz(self, velocidade_vento, taxa_emissao, classe_estabilidade):
+    def gerar_meshgrid_xyz(self, puff: Puff):
+
         x_max = self.config.dimensao_eixo_x
         x_step = self.config.passo_x
         y_max = self.config.dimensao_eixo_y
@@ -34,27 +33,57 @@ class GaussianPlumeModel:
         z_vals = np.linspace(0, z_max, num_z)
 
         X, Y, Z = np.meshgrid(x_vals, y_vals, z_vals, indexing='ij')
-        return self.calcular_concentracao(X, Y, Z, velocidade_vento, taxa_emissao, classe_estabilidade), x_vals, y_vals, z_vals
 
-    def calcular_concentracao(self, X, Y, Z, velocidade_vento, taxa_emissao, classe_estabilidade):
-        sigma_y = self.calcular_sigma_y(X, classe_estabilidade)
-        sigma_z = self.calcular_sigma_z(X, classe_estabilidade)
+        return self.calcular_concentracao(X, Y, Z, puff), x_vals, y_vals, z_vals
 
-        fator = taxa_emissao / (
-            2 * math.pi * velocidade_vento * sigma_y * sigma_z
+    def calcular_concentracao(self, X, Y, Z, puff: Puff):
+        
+        idade_segundos = self.config.total_eventos - puff.instante_emissao
+    
+        x_centro = puff.velocidade_vento*idade_segundos
+        
+        sigma_y = self.calcular_sigma_y(x_centro, puff.classe_estabilidade)
+        sigma_x = sigma_y
+        sigma_z = self.calcular_sigma_z(x_centro, puff.classe_estabilidade)
+
+        fator = (
+
+            puff.atividade_emitida
+            /
+            (
+                (2*np.pi)**1.5
+                * sigma_x
+                * sigma_y
+                * sigma_z
+            )
         )
 
-        expo1 = -(
-            (Y ** 2) / (2 * (sigma_y ** 2)) +
-            ((Z - self.config.altura_chamine) ** 2) / (2 * (sigma_z ** 2))
+        exp_x = np.exp(
+            -((X - x_centro)**2)
+            /(2*sigma_x**2)
         )
 
-        expo2 = -(
-            (Y ** 2) / (2 * (sigma_y ** 2)) +
-            ((Z + self.config.altura_chamine) ** 2) / (2 * (sigma_z ** 2))
+        exp_y = np.exp(
+            -(Y**2)
+            /(2*sigma_y**2)
         )
 
-        return fator * (np.exp(expo1) + np.exp(expo2))
+        exp_z1 = np.exp(
+            -((Z-self.config.altura_chamine)**2)
+            /(2*sigma_z**2)
+        )
+
+        exp_z2 = np.exp(
+            -((Z+self.config.altura_chamine)**2)
+            /(2*sigma_z**2)
+        )
+
+        return (
+            fator
+            * exp_x
+            * exp_y
+            * (exp_z1 + exp_z2)
+        )
 
     def calcular_sigma_y(self, x, classe_estabilidade):
         classe = classe_estabilidade.upper()

@@ -6,7 +6,7 @@ class Config:
     converter_ci_bq: bool = False
     unidade: str = "Ci"
 
-    altura_chamine: int = 100       # [m]
+    altura_chamine: int = 1         # [m]
     terreno: str = "R"              # R para rural, U para urbano
 
     vento_min: int = 4 	            #[m/s]
@@ -16,32 +16,31 @@ class Config:
     emissao_max: int = 12	        #[Ci máximo para um evento discreto]
 
     seed: int = 42
-    total_eventos: int = 6	        #[eventos]
-    intervalo_evento: int = 1	    #[h]
+    total_eventos: int = 30	        #[eventos]
 
-    vento_teste_fixo: int = 5
-    emissao_teste_fixo: int = 10 
+    vento_teste_fixo: int = 1
+    emissao_teste_fixo: int = 1 
     classe_teste_fixo: str = "C"
 
-    dimensao_eixo_x: int = 20000     # [m] inteiro >= 1 e multiplo de passo_x
-    dimensao_eixo_y: int = 5000      # [m] inteiro >= 0 e multiplo de passo_y
-    dimensao_eixo_z: int = 5000      # [m] inteiro >= 0 e multiplo de passo_z
-    passo_x: int = 100               # [m] inteiro >= 1
-    passo_y: int = 100               # [m] inteiro >= 1
-    passo_z: int = 100               # [m] inteiro >= 1
-    limite_pontos: int = 1_250_000   # limite de pontos por evento discreto (sugestão: 10^6)
+    dimensao_eixo_x: int = 100       # [m] inteiro >= 1 e multiplo de passo_x
+    dimensao_eixo_y: int = 25        # [m] inteiro >= 0 e multiplo de passo_y
+    dimensao_eixo_z: int = 50        # [m] inteiro >= 0 e multiplo de passo_z
+    passo_x: int = 1                 # [m] inteiro >= 1
+    passo_y: int = 1                 # [m] inteiro >= 1
+    passo_z: int = 1                 # [m] inteiro >= 1
+    limite_pontos: int = 500_000     # limite de pontos por evento discreto (sugestão: 10^6)
 
     plotar_heatmap_xy: bool = True
     z_corte: int = 0                # altura z do corte no plano xy
                                     # multiplos de passo_z (ou zero)
                                     # Obs.: zero para nivel do solo
 
-    plotar_heatmap_yz: bool = True
-    x_corte: int = 5000             # distancia x do corte no plano yz
+    plotar_heatmap_yz: bool = False
+    x_corte: int = 50               # distancia x do corte no plano yz
                                     # multiplos de passo_x
 
-    plotar_heatmap_xz: bool = True
-    y_corte: int = 500              # lateralidade y do corte no plano xz
+    plotar_heatmap_xz: bool = False
+    y_corte: int = 5                # lateralidade y do corte no plano xz
                                     # multiplos de passo_y
 
     gamma: float = 0.4              # 0.3 a 0.9
