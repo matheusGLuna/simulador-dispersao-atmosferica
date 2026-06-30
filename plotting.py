@@ -11,6 +11,7 @@ def plotar_heatmap_xy(
     concentracoes_xyz,
     eixo_x,
     eixo_y,
+    eixo_z,
     evento=None,
     exibir_maximo=True,
     campo_acumulado=False
@@ -20,7 +21,6 @@ def plotar_heatmap_xy(
     # =============================================================================
 
     z_corte = config.z_corte
-    z_step = config.passo_z
     z_max = config.dimensao_eixo_z
 
     if not (0 <= z_corte <= z_max):
@@ -28,12 +28,7 @@ def plotar_heatmap_xy(
             "z_corte deve estar no domínio (>= 0 e <= dimensao_eixo_z)"
         )
 
-    if z_corte % z_step != 0:
-        raise ValueError(
-            "z_corte deve ser múltiplo inteiro de passo_z (ou zero)"
-        )
-
-    i_z_corte = int(z_corte // z_step)
+    i_z_corte = obter_indice_corte(eixo_z, z_corte, "z_corte", "z")
     malha_xy = concentracoes_xyz[:, :, i_z_corte]
 
     x_i, y_i = np.unravel_index(np.argmax(malha_xy), malha_xy.shape)
@@ -53,7 +48,7 @@ def plotar_heatmap_xy(
     render_heatmap(
         matrix=malha_yx,
         extent=[
-            config.passo_x,
+            -config.dimensao_eixo_x,
             config.dimensao_eixo_x,
             -config.dimensao_eixo_y,
             config.dimensao_eixo_y,
@@ -208,7 +203,7 @@ def apresentar_maximos_cortes(
 
     if config.plotar_heatmap_xy:
         z_corte = config.z_corte
-        i_z_corte = int(z_corte // config.passo_z)
+        i_z_corte = obter_indice_corte(eixo_z, z_corte, "z_corte", "z")
         malha_xy = concentracoes_xyz[:, :, i_z_corte]
         x_i, y_i = np.unravel_index(np.argmax(malha_xy), malha_xy.shape)
         print(
@@ -262,6 +257,7 @@ def plotar_cortes_acumulados(
             concentracoes_xyz,
             eixo_x,
             eixo_y,
+            eixo_z,
             exibir_maximo=False,
             campo_acumulado=True
         )
@@ -348,3 +344,15 @@ def render_heatmap(
 
 def show_heatmap():
     plt.show()
+
+def obter_indice_corte(eixo, valor_corte, nome_corte, nome_eixo):
+    indices = np.where(np.isclose(eixo, valor_corte))[0]
+
+    if len(indices) == 0:
+        valores_disponiveis = ", ".join(f"{valor:.2f}" for valor in eixo)
+        raise ValueError(
+            f"{nome_corte}={valor_corte} não corresponde a nenhum ponto do "
+            f"eixo {nome_eixo}. Valores disponíveis: {valores_disponiveis}"
+        )
+
+    return int(indices[0])

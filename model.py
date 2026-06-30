@@ -15,9 +15,9 @@ class GaussianPuffModel:
         z_max = self.config.dimensao_eixo_z
         z_step = self.config.passo_z
 
-        num_x = int(x_max / x_step)
+        num_x = int(2 * x_max / x_step) + 1
         num_y = int(2 * y_max / y_step) + 1
-        num_z = int(z_max / z_step) + 1
+        num_z = int(z_max / z_step)
         total_pontos = num_x * num_y * num_z
 
         if total_pontos > self.config.limite_pontos:
@@ -28,9 +28,9 @@ class GaussianPuffModel:
             )
             raise ValueError(error_string)
 
-        x_vals = np.linspace(x_step, x_max, num_x)
+        x_vals = np.linspace(-x_max, x_max, num_x)
         y_vals = np.linspace(-y_max, y_max, num_y)
-        z_vals = np.linspace(0, z_max, num_z)
+        z_vals = np.linspace(1, z_max, num_z)
 
         X, Y, Z = np.meshgrid(x_vals, y_vals, z_vals, indexing='ij')
 
@@ -38,16 +38,17 @@ class GaussianPuffModel:
 
     def calcular_concentracao(self, X, Y, Z, puff: Puff):
         
-        idade_segundos = self.config.total_eventos - puff.instante_emissao
-    
-        x_centro = puff.velocidade_vento*idade_segundos
-        
-        sigma_y = self.calcular_sigma_y(x_centro, puff.classe_estabilidade)
+        angulo_graus = puff.angulo_vento % 360
+        angulo_rad = np.deg2rad(angulo_graus)
+
+        centro_x = puff.idade*puff.velocidade_vento*np.cos(angulo_rad)
+        centro_y = puff.idade*puff.velocidade_vento*np.sin(angulo_rad)
+
+        sigma_y = self.calcular_sigma_y(puff)
+        sigma_z = self.calcular_sigma_z(puff)
         sigma_x = sigma_y
-        sigma_z = self.calcular_sigma_z(x_centro, puff.classe_estabilidade)
 
         fator = (
-
             puff.atividade_emitida
             /
             (
@@ -59,12 +60,12 @@ class GaussianPuffModel:
         )
 
         exp_x = np.exp(
-            -((X - x_centro)**2)
+            -((X - centro_x)**2)
             /(2*sigma_x**2)
         )
 
         exp_y = np.exp(
-            -(Y**2)
+            -((Y - centro_y)**2)
             /(2*sigma_y**2)
         )
 
@@ -78,77 +79,56 @@ class GaussianPuffModel:
             /(2*sigma_z**2)
         )
 
-        return (
-            fator
-            * exp_x
-            * exp_y
-            * (exp_z1 + exp_z2)
-        )
+        concentracao = fator*exp_x* exp_y*(exp_z1 + exp_z2)
+        
+        return concentracao
 
-    def calcular_sigma_y(self, x, classe_estabilidade):
-        classe = classe_estabilidade.upper()
+    def calcular_sigma_y(self, puff: Puff):
+        classe = puff.classe_estabilidade.upper()
         terreno = self.config.terreno.upper()
+        coeficientes = self.obter_coeficientes_sigma(terreno, classe)
 
-        if terreno == 'R':
-            if classe == 'A':
-                return 0.22 * x * (1 + 0.0001 * x) ** (-0.5)
-            elif classe == 'B':
-                return 0.16 * x * (1 + 0.0001 * x) ** (-0.5)
-            elif classe == 'C':
-                return 0.11 * x * (1 + 0.0001 * x) ** (-0.5)
-            elif classe == 'D':
-                return 0.08 * x * (1 + 0.0001 * x) ** (-0.5)
-            elif classe == 'E':
-                return 0.06 * x * (1 + 0.0001 * x) ** (-0.5)
-            elif classe == 'F':
-                return 0.04 * x * (1 + 0.0001 * x) ** (-0.5)
-            else:
-                raise ValueError("Classe de estabilidade inválida")
+        a = coeficientes['a']
+        b = coeficientes['b']
 
-        elif terreno == 'U':
-            if classe in ['A', 'B']:
-                return 0.32 * x * (1 + 0.0004 * x) ** (-0.5)
-            elif classe == 'C':
-                return 0.22 * x * (1 + 0.0004 * x) ** (-0.5)
-            elif classe == 'D':
-                return 0.16 * x * (1 + 0.0004 * x) ** (-0.5)
-            elif classe in ['E', 'F']:
-                return 0.11 * x * (1 + 0.0004 * x) ** (-0.5)
-            else:
-                raise ValueError("Classe de estabilidade inválida")
+        distancia_centro_puff = puff.velocidade_vento*puff.idade
+        return a * distancia_centro_puff ** b
 
-        raise ValueError("Terreno inválido: use 'R' (rural) ou 'U' (urbano)")
-
-    def calcular_sigma_z(self, x, classe_estabilidade):
-        classe = classe_estabilidade.upper()
+    def calcular_sigma_z(self, puff: Puff):
+        classe = puff.classe_estabilidade.upper()
         terreno = self.config.terreno.upper()
+        coeficientes = self.obter_coeficientes_sigma(terreno, classe)
 
-        if terreno == 'R':
-            if classe == 'A':
-                return 0.20 * x
-            elif classe == 'B':
-                return 0.12 * x
-            elif classe == 'C':
-                return 0.08 * x * (1 + 0.0002 * x) ** (-0.5)
-            elif classe == 'D':
-                return 0.06 * x * (1 + 0.0015 * x) ** (-0.5)
-            elif classe == 'E':
-                return 0.03 * x * (1 + 0.0003 * x) ** (-1.0)
-            elif classe == 'F':
-                return 0.016 * x * (1 + 0.0003 * x) ** (-1.0)
-            else:
-                raise ValueError("Classe de estabilidade inválida")
+        c = coeficientes['c']
+        d = coeficientes['d']
 
-        elif terreno == 'U':
-            if classe in ['A', 'B']:
-                return 0.24 * x * (1 + 0.001 * x) ** 0.5
-            elif classe == 'C':
-                return 0.20 * x
-            elif classe == 'D':
-                return 0.14 * x * (1 + 0.0003 * x) ** (-0.5)
-            elif classe in ['E', 'F']:
-                return 0.08 * x * (1 + 0.0015 * x) ** (-0.5)
-            else:
-                raise ValueError("Classe de estabilidade inválida")
+        distancia_centro_puff = puff.velocidade_vento*puff.idade
+        return c * distancia_centro_puff ** d
 
-        raise ValueError("Terreno inválido: use 'R' (rural) ou 'U' (urbano)")
+    def obter_coeficientes_sigma(self, terreno, classe):
+        coeficientes = {
+            'R': {
+                'A': {'a': 0.18, 'b': 0.92, 'c': 0.72, 'd': 0.80},
+                'B': {'a': 0.14, 'b': 0.92, 'c': 0.53, 'd': 0.80},
+                'C': {'a': 0.10, 'b': 0.92, 'c': 0.34, 'd': 0.80},
+                'D': {'a': 0.06, 'b': 0.92, 'c': 0.15, 'd': 0.80},
+                'E': {'a': 0.045, 'b': 0.92, 'c': 0.12, 'd': 0.80},
+                'F': {'a': 0.03, 'b': 0.92, 'c': 0.08, 'd': 0.80},
+            },
+            'U': {
+                'A': {'a': 0.32, 'b': 0.90, 'c': 0.24, 'd': 0.91},
+                'B': {'a': 0.32, 'b': 0.90, 'c': 0.24, 'd': 0.91},
+                'C': {'a': 0.22, 'b': 0.90, 'c': 0.14, 'd': 0.91},
+                'D': {'a': 0.16, 'b': 0.90, 'c': 0.08, 'd': 0.91},
+                'E': {'a': 0.11, 'b': 0.90, 'c': 0.04, 'd': 0.91},
+                'F': {'a': 0.11, 'b': 0.90, 'c': 0.04, 'd': 0.91},
+            },
+        }
+
+        if terreno not in coeficientes:
+            raise ValueError("Terreno inválido: use 'R' (rural) ou 'U' (urbano)")
+
+        if classe not in coeficientes[terreno]:
+            raise ValueError("Classe de estabilidade inválida")
+
+        return coeficientes[terreno][classe]

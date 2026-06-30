@@ -24,27 +24,35 @@ if __name__ == "__main__":
 
     lista_puffs = []
 
-    for evento in range(config.total_eventos):
+    for evento in range(config.total_eventos - 2):
 
+        idade = (config.total_eventos - evento) * config.intervalo_t_eventos
+
+    #    atividade_emitida = scenario.obter_taxa_emissao(evento)
     #    velocidade_vento = scenario.obter_velocidade_vento(evento)
-    #    emissao = scenario.obter_taxa_emissao(evento)
+    #    angulo_vento = scenario.obter_???(evento)
     #    classe_estabilidade = scenario.obter_classe_estabilidade(evento)
 
+        atividade_emitida = config.emissao_teste_fixo
         velocidade_vento = config.vento_teste_fixo
-        emissao = config.emissao_teste_fixo
+        angulo_vento_variante_teste = config.angulo_teste_fixo - evento
         classe_estabilidade = config.classe_teste_fixo
 
         puff = Puff(
-            instante_emissao = evento,
-            atividade_emitida = emissao,
+            evento = evento,
+            idade = idade,
+            atividade_emitida = atividade_emitida,
             velocidade_vento = velocidade_vento,
+            angulo_vento = angulo_vento_variante_teste,
             classe_estabilidade = classe_estabilidade
         )
 
         lista_puffs.append(puff)
 
-    for puff in lista_puffs:
+    for puff in reversed(lista_puffs):
 
+        id_puff = puff.evento + 1
+        
         (
             concentracoes_puff_xyz,
             eixo_x,
@@ -76,14 +84,15 @@ if __name__ == "__main__":
         #     classe_estabilidade=classe_estabilidade
         # )
 
-        print(f"meshgrid de concentrações C(x,y,z) modelado com sucesso para o jato puff {puff.instante_emissao}\n")
+        print(f"meshgrid modelado com sucesso para o puff {id_puff}\n")
 
         if config.plotar_heatmap_xy:
             plotting.plotar_heatmap_xy(
-                concentracoes_puff_xyz,
+                concentracoes_xyz,
                 eixo_x,
                 eixo_y,
-                puff.instante_emissao,
+                eixo_z,
+                id_puff,
                 exibir_maximo=False,
                 campo_acumulado=False
             )
@@ -93,7 +102,7 @@ if __name__ == "__main__":
                 concentracoes_puff_xyz,
                 eixo_y,
                 eixo_z,
-                puff.instante_emissao,
+                id_puff,
                 exibir_maximo=False,
                 campo_acumulado=False
             )
@@ -103,7 +112,7 @@ if __name__ == "__main__":
                 concentracoes_puff_xyz,
                 eixo_x,
                 eixo_z,
-                puff.instante_emissao,
+                id_puff,
                 exibir_maximo=False,
                 campo_acumulado=False
             )
