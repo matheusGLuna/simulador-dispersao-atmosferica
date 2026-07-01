@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     lista_puffs = []
 
-    for evento in range(config.total_eventos - 2):
+    for evento in range(config.total_eventos - 10):
 
         idade = (config.total_eventos - evento) * config.intervalo_t_eventos
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
         atividade_emitida = config.emissao_teste_fixo
         velocidade_vento = config.vento_teste_fixo
-        angulo_vento_variante_teste = config.angulo_teste_fixo - evento
+        angulo_vento_variante_teste = config.angulo_teste_fixo + evento
         classe_estabilidade = config.classe_teste_fixo
 
         puff = Puff(
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
         lista_puffs.append(puff)
 
-    for puff in reversed(lista_puffs):
+    for puff in lista_puffs:
 
         id_puff = puff.evento + 1
         
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
         if config.plotar_heatmap_xy:
             plotting.plotar_heatmap_xy(
-                concentracoes_xyz,
+                concentracoes_puff_xyz,
                 eixo_x,
                 eixo_y,
                 eixo_z,

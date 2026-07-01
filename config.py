@@ -17,19 +17,19 @@ class Config:
 
     seed: int = 42
 
-    total_eventos: int = 72         #[eventos]
-    intervalo_t_eventos: int = 600  #[segundos, para cada evento]
+    total_eventos: int = 70         #[eventos]
+    intervalo_t_eventos: int = 60   #[segundos, para cada evento]
 
     vento_teste_fixo: int = 1       #modulo da velocidade do vento, em m/min
-    angulo_teste_fixo: int = 30     #angulo do vento em graus (0 a 359)
+    angulo_teste_fixo: int = 0      #angulo do vento em graus (0 a 359)
     emissao_teste_fixo: int = 1         
     classe_teste_fixo: str = "C"
 
-    dimensao_eixo_x: int = 40000     # [m] inteiro >= 1 e multiplo de passo_x
-    dimensao_eixo_y: int = 40000     # [m] inteiro >= 0 e multiplo de passo_y
+    dimensao_eixo_x: int = 4000      # [m] inteiro >= 1 e multiplo de passo_x
+    dimensao_eixo_y: int = 4000      # [m] inteiro >= 0 e multiplo de passo_y
     dimensao_eixo_z: int = 1         # [m] inteiro >= 0 e multiplo de passo_z
-    passo_x: int = 100               # [m] inteiro >= 1
-    passo_y: int = 100               # [m] inteiro >= 1
+    passo_x: int = 10                # [m] inteiro >= 1
+    passo_y: int = 10                # [m] inteiro >= 1
     passo_z: int = 1                 # [m] inteiro >= 1
     limite_pontos: int = 1000000     # limite de pontos por evento discreto (sugestão: 10^6)
 
