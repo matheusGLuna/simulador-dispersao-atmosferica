@@ -15,8 +15,8 @@ class GaussianPuffModel:
         z_max = self.config.dimensao_eixo_z
         z_step = self.config.passo_z
 
-        num_x = int(2 * x_max / x_step) + 1
-        num_y = int(2 * y_max / y_step) + 1
+        num_x = int(2 * x_max / x_step)
+        num_y = int(2 * y_max / y_step)
         num_z = int(z_max / z_step)
         total_pontos = num_x * num_y * num_z
 

@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     lista_puffs = []
 
-    for evento in range(config.total_eventos - 4):
+    for evento in range(config.total_eventos - 60):
 
         idade = (config.total_eventos - evento) * config.intervalo_t_eventos
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
         atividade_emitida = config.emissao_teste_fixo
         velocidade_vento = config.vento_teste_fixo
-        angulo_vento_variante_teste = config.angulo_teste_fixo + 0.5*evento
+        angulo_vento_variante_teste = config.angulo_teste_fixo + 0.05*evento
         classe_estabilidade = config.classe_teste_fixo
 
         puff = Puff(
@@ -56,12 +56,6 @@ if __name__ == "__main__":
         )
 
         lista_puffs.append(puff)
-
-    fim_clock_1 = datetime.now()
-    fim_1 = time.perf_counter()
-
-    print(f"Fim 1 : {fim_clock_1.strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Tempo de processamento 1 : {fim_1 - inicio:.2f} segundos")   
 
     for puff in lista_puffs:
 
@@ -131,11 +125,11 @@ if __name__ == "__main__":
         #         campo_acumulado=False
         #     )
 
-    fim_clock_2 = datetime.now()
-    fim_2 = time.perf_counter()
+    fim_clock_1 = datetime.now()
+    fim_1 = time.perf_counter()
 
-    print(f"Fim 2 : {fim_clock_2.strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Tempo de processamento 2 : {fim_2 - fim_1:.2f} segundos")   
+    print(f"Fim 1 : {fim_clock_1.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Tempo de processamento 1 : {fim_1 - inicio:.2f} segundos")   
 
     if concentracoes_xyz is not None:
         print("Campo resultante acumulado com sucesso\n")
