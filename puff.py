@@ -5,7 +5,7 @@ class Puff:
 
     evento: int                 # evento discreto da simulação associado a este puff (adimensional)
 
-    idade: int                  # tempo decorrido desde a emissao deste puff [segundos]
+    idade: int                  # tempo decorrido desde a emissao deste puff até o instante simulado [segundos]
 
     atividade_emitida: float    # atividade emitida por este puff [Ci ou Bq]
 

@@ -17,21 +17,23 @@ class Config:
 
     seed: int = 42
 
-    total_eventos: int = 780        #[eventos]
-    intervalo_t_eventos: int = 60   #[segundos, para cada evento]
+    total_eventos: int = 48         #[eventos]
+    intervalo_t_eventos: int = 900  #[segundos, para cada evento]
 
-    vento_teste_fixo: int = 0.1     #modulo da velocidade do vento, em m/min
+    vento_teste_fixo: int = 1       #modulo da velocidade do vento, em m/min
     angulo_teste_fixo: int = 0      #angulo do vento em graus (-360 a 360)
     emissao_teste_fixo: int = 1         
-    classe_teste_fixo: str = "A"
+    classe_teste_fixo: str = "C"
 
-    dimensao_eixo_x: int = 5000     # [m] inteiro >= 1 e multiplo de passo_x
-    dimensao_eixo_y: int = 5000     # [m] inteiro >= 0 e multiplo de passo_y
+    dimensao_eixo_x: int = 10000    # [m] inteiro >= 1 e multiplo de passo_x
+    dimensao_eixo_y: int = 10000    # [m] inteiro >= 0 e multiplo de passo_y
     dimensao_eixo_z: int = 1        # [m] inteiro >= 0 e multiplo de passo_z
-    passo_x: int = 10               # [m] inteiro >= 1
-    passo_y: int = 10               # [m] inteiro >= 1
+    passo_x: int = 20               # [m] inteiro >= 1
+    passo_y: int = 20               # [m] inteiro >= 1
     passo_z: int = 1                # [m] inteiro >= 1
     limite_pontos: int = 1000000    # limite de pontos por evento discreto (sugestão: 10^6)
+
+    simular_momento_a_momento: bool = True
 
     plotar_heatmap_xy: bool = True
     z_corte: int = 1                # altura z do corte no plano xy
