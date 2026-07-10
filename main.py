@@ -1,6 +1,8 @@
 from pathlib import Path
 from datetime import datetime
 from typing import List
+import shutil
+import subprocess
 import time
 
 import numpy as np
@@ -87,17 +89,14 @@ if __name__ == "__main__":
 
         if concentracoes_xy is not None:
             vmax_referencia = float(np.max(concentracoes_xy))
-            print("Campo resultante acumulado com sucesso\n")
-            plotting.apresentar_maximo_campo(
-                concentracoes_xy,
-                eixo_x,
-                eixo_y
-            )
-            plotting.plotar_campo_acumulado(
+            print("Campo resultante acumulado com sucesso")
+            print(f"Vmax de referência para os heatmaps: {vmax_referencia:.3e} {config.unidade}/m³")
+            plotting.plotar_heatmap_xy(
                 concentracoes_xy,
                 eixo_x,
                 eixo_y,
-                vmax_referencia
+                campo_acumulado=True,
+                vmax_referencia=vmax_referencia,
             )
 
         fim_clock_1 = datetime.now()
@@ -160,7 +159,6 @@ if __name__ == "__main__":
                 eixo_x,
                 eixo_y,
                 evento + 1,
-                exibir_maximo=False,
                 campo_acumulado=False,
                 vmax_referencia=vmax_referencia,
             )
@@ -169,3 +167,36 @@ if __name__ == "__main__":
         fim_2 = time.perf_counter()
         print(f"Fim 2 : {fim_clock_2.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"Tempo de processamento 2 : {fim_2 - inicio:.2f} segundos")
+
+        diretorio_plotagens = (
+            Path(config.diretorio_dados_parciais)
+            / f"cenario{config.seed}"
+            / config.diretorio_plotagens_parciais
+        )
+        arquivo_video = diretorio_plotagens / "evolucao_temporal.mp4"
+        ffmpeg = shutil.which("ffmpeg")
+
+        if ffmpeg is None:
+            print("FFmpeg não encontrado; o vídeo temporal não foi gerado.")
+        else:
+            comando_ffmpeg = [
+                ffmpeg,
+                "-y",
+                "-framerate",
+                "10",
+                "-start_number",
+                "1",
+                "-i",
+                str(diretorio_plotagens / "evento_%02d_heatmap_xy.png"),
+                "-c:v",
+                "libx264",
+                "-pix_fmt",
+                "yuv420p",
+                str(arquivo_video),
+            ]
+
+            try:
+                subprocess.run(comando_ffmpeg, check=True)
+                print(f"Vídeo temporal salvo em: {arquivo_video}")
+            except subprocess.CalledProcessError as error:
+                print(f"Falha ao gerar o vídeo temporal: {error}")

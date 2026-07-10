@@ -15,97 +15,31 @@ def plotar_heatmap_xy(
     eixo_x,
     eixo_y,
     evento=None,
-    exibir_maximo=True,
     campo_acumulado=False,
     vmax_referencia=None,
 ):
     """Plota a concentração no plano XY, ao nível do solo (z = 0)."""
-    x_i, y_i = np.unravel_index(np.argmax(concentracoes_xy), concentracoes_xy.shape)
-
-    if exibir_maximo:
-        print(
-            f"C(x,y,z=0) máxima é de "
-            f"{concentracoes_xy[x_i, y_i]:.3e} {config.unidade}/m³"
-        )
-        print(f"Ocorre em x = {eixo_x[x_i]:.2f} m e y = {eixo_y[y_i]:.2f} m\n")
-
-    render_heatmap(
-        matrix=concentracoes_xy.transpose(),
-        extent=[
-            eixo_x[0],
-            eixo_x[-1],
-            eixo_y[0],
-            eixo_y[-1],
-        ],
-        title="C(x,y) ao nível do solo (z = 0 m)",
-        xlabel="x (m)",
-        ylabel="y (m)",
-        filename=(
-            "campo_resultante_heatmap_xy.png"
-            if campo_acumulado
-            else f"evento_{evento:02d}_heatmap_xy.png"
-        ),
-        hlines=[(0, "--", "white")],
-        campo_acumulado=campo_acumulado,
-        vmax_referencia=vmax_referencia,
+    matrix = concentracoes_xy.transpose()
+    extent = [eixo_x[0], eixo_x[-1], eixo_y[0], eixo_y[-1]]
+    filename = (
+        "campo_resultante_heatmap_xy.png"
+        if campo_acumulado
+        else f"evento_{evento:02d}_heatmap_xy.png"
     )
 
-
-def apresentar_maximo_campo(concentracoes_xy, eixo_x, eixo_y):
-    """Apresenta o ponto de maior concentração do campo acumulado no solo."""
-    print("Máximo de concentração do campo resultante:\n")
-    x_i, y_i = np.unravel_index(np.argmax(concentracoes_xy), concentracoes_xy.shape)
-    print(
-        f"C(x,y,z=0) máxima é de "
-        f"{concentracoes_xy[x_i, y_i]:.3e} {config.unidade}/m³"
-    )
-    print(f"Ocorre em x = {eixo_x[x_i]:.2f} m e y = {eixo_y[y_i]:.2f} m\n")
-
-
-def plotar_campo_acumulado(concentracoes_xy, eixo_x, eixo_y, vmax_referencia):
-    """Gera e mantém aberta a figura do campo acumulado no plano XY."""
-    plotar_heatmap_xy(
-        concentracoes_xy,
-        eixo_x,
-        eixo_y,
-        exibir_maximo=False,
-        campo_acumulado=True,
-        vmax_referencia=vmax_referencia,
-    )
-
-
-def render_heatmap(
-    matrix,
-    extent,
-    title,
-    xlabel,
-    ylabel,
-    filename,
-    aspect=1,
-    hlines=None,
-    vlines=None,
-    campo_acumulado=False,
-    vmax_referencia=None,
-):
     figura, eixo = plt.subplots(figsize=(12, 6), dpi=150)
     imagem = eixo.imshow(
         matrix,
         origin="lower",
         extent=extent,
-        aspect=aspect,
+        aspect=1,
         norm=obter_normalizacao(vmax_referencia),
     )
-    eixo.set_title(title)
-    eixo.set_xlabel(xlabel)
-    eixo.set_ylabel(ylabel)
-
-    if vlines is not None:
-        for position, style, color in vlines:
-            eixo.axvline(x=position, linestyle=style, color=color)
-
-    if hlines is not None:
-        for position, style, color in hlines:
-            eixo.axhline(y=position, linestyle=style, color=color)
+    eixo.set_title("C(x,y) ao nível do solo (z = 0 m)")
+    eixo.set_xlabel("x (m)")
+    eixo.set_ylabel("y (m)")
+    eixo.axhline(y=0, linestyle="--", color="white", linewidth=0.5)
+    eixo.axvline(x=0, linestyle="--", color="white", linewidth=0.5)
 
     if config.usar_escala_logaritmica and config.exibir_contornos_logaritmicos:
         niveis = np.geomspace(

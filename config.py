@@ -17,16 +17,16 @@ class Config:
 
     seed: int = 1
 
-    total_eventos: int = 60             #[eventos]
+    total_eventos: int = 120            #[eventos]
     intervalo_tempo_evento: int = 60    #[segundos, para cada evento]
 
     vento_teste_fixo: int = 1       #modulo da velocidade do vento, em m/min
     emissao_teste_fixo: int = 1         
     classe_teste_fixo: str = "C"
 
-    dim_eixo_x_pos: int = 4000      # [m] inteiro >= 1 e multiplo de passo_x
-    dim_eixo_x_neg: int = 0         # [m] inteiro >= 0 e multiplo de passo_x
-    dim_eixo_y_pos: int = 2000      # [m] inteiro >= 1 e multiplo de passo_y
+    dim_eixo_x_pos: int = 6000      # [m] inteiro >= 1 e multiplo de passo_x
+    dim_eixo_x_neg: int = 250       # [m] inteiro >= 0 e multiplo de passo_x
+    dim_eixo_y_pos: int = 3000      # [m] inteiro >= 1 e multiplo de passo_y
     dim_eixo_y_neg: int = 500       # [m] inteiro >= 0 e multiplo de passo_y
     passo_x: int = 5                # [m] inteiro >= 1
     passo_y: int = 5                # [m] inteiro >= 1
