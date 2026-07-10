@@ -6,37 +6,59 @@ class GaussianPuffModel:
     def __init__(self, config: Config):
         self.config = config
 
-    def gerar_meshgrid_xyz(self, puff: Puff):
+    def gerar_meshgrid_xy(self, puff: Puff):
 
-        x_max = self.config.dimensao_eixo_x
+        x_pos = self.config.dim_eixo_x_pos
+        x_neg = self.config.dim_eixo_x_neg
         x_step = self.config.passo_x
-        y_max = self.config.dimensao_eixo_y
+        y_pos = self.config.dim_eixo_y_pos
+        y_neg = self.config.dim_eixo_y_neg
         y_step = self.config.passo_y
-        z_max = self.config.dimensao_eixo_z
-        z_step = self.config.passo_z
 
-        num_x = int(2 * x_max / x_step)
-        num_y = int(2 * y_max / y_step)
-        num_z = int(z_max / z_step)
-        total_pontos = num_x * num_y * num_z
+        self.validar_parametros_malha(x_pos, x_neg, x_step, "x")
+        self.validar_parametros_malha(y_pos, y_neg, y_step, "y")
+
+        num_x = (x_pos + x_neg) // x_step + 1
+        num_y = (y_pos + y_neg) // y_step + 1
+        total_pontos = num_x * num_y
 
         if total_pontos > self.config.limite_pontos:
             error_string = (
-                f"Essa modelagem resultaria em {total_pontos} pontos, acima do "
+                f"Essa modelagem resultaria em {total_pontos} pontos calculados por evento, acima do "
                 f"limite parametrizado de {self.config.limite_pontos}.\n"
                 "Aumente o limite parametrizado ou os intervalos (passos) entre pontos"
             )
             raise ValueError(error_string)
 
-        x_vals = np.linspace(-x_max, x_max, num_x)
-        y_vals = np.linspace(-y_max, y_max, num_y)
-        z_vals = np.linspace(1, z_max, num_z)
+        x_vals = np.linspace(-x_neg, x_pos, num_x)
+        y_vals = np.linspace(-y_neg, y_pos, num_y)
 
-        X, Y, Z = np.meshgrid(x_vals, y_vals, z_vals, indexing='ij')
+        X, Y = np.meshgrid(x_vals, y_vals, indexing='ij')
 
-        return self.calcular_concentracao(X, Y, Z, puff), x_vals, y_vals, z_vals
+        return self.calcular_concentracao(X, Y, puff), x_vals, y_vals
 
-    def calcular_concentracao(self, X, Y, Z, puff: Puff):
+    @staticmethod
+    def validar_parametros_malha(limite_positivo, limite_negativo, passo, eixo):
+        """Valida limites e espaçamento de um eixo da malha."""
+        if limite_positivo < 0 or limite_negativo < 0:
+            raise ValueError(
+                f"Os limites positivo e negativo do eixo {eixo} devem ser não negativos"
+            )
+
+        if passo <= 0:
+            raise ValueError(f"O passo do eixo {eixo} deve ser maior que zero")
+
+        extensao = limite_positivo + limite_negativo
+        if extensao == 0:
+            raise ValueError(f"A extensão do eixo {eixo} deve ser maior que zero")
+
+        if extensao % passo != 0:
+            raise ValueError(
+                f"A extensão do eixo {eixo} ({extensao} m) deve ser múltipla do passo "
+                f"({passo} m)"
+            )
+
+    def calcular_concentracao(self, X, Y, puff: Puff):
         
         angulo_graus = puff.angulo_vento % 360
         angulo_rad = np.deg2rad(angulo_graus)
@@ -69,17 +91,12 @@ class GaussianPuffModel:
             /(2*sigma_y**2)
         )
 
-        exp_z1 = np.exp(
-            -((Z-self.config.altura_chamine)**2)
+        exp_z_solo = 2*np.exp(
+            -(self.config.altura_chamine**2)
             /(2*sigma_z**2)
         )
 
-        exp_z2 = np.exp(
-            -((Z+self.config.altura_chamine)**2)
-            /(2*sigma_z**2)
-        )
-
-        concentracao = fator*exp_x* exp_y*(exp_z1 + exp_z2)
+        concentracao = fator*exp_x* exp_y*exp_z_solo
         
         return concentracao
 
