@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
         atividade_emitida = config.emissao_teste_fixo
         velocidade_vento = config.vento_teste_fixo
-        angulo_vento_variante_teste = config.angulo_teste_fixo + evento
+        angulo_vento_variante_teste = config.angulo_teste_fixo + evento*0
         classe_estabilidade = config.classe_teste_fixo
 
         puff = Puff(
@@ -93,11 +93,10 @@ if __name__ == "__main__":
 
     if config.simular_evolucao_temporal:
 
-        concentracoes_xy = None
-
         for evento in range(config.total_eventos):
 
             print (f"evento {evento} sendo processado... ")
+            concentracoes_xy = None
 
             for puff in lista_puffs:
                 

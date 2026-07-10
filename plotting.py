@@ -109,13 +109,13 @@ def render_heatmap(
     if campo_acumulado:
         output_dir = (
             Path(config.diretorio_dados_acumulados)
-            / f"s{config.seed}"
+            / f"cenario{config.seed}"
             / config.diretorio_plotagens_acumuladas
         )
     else:
         output_dir = (
             Path(config.diretorio_dados_parciais)
-            / f"s{config.seed}"
+            / f"cenario{config.seed}"
             / config.diretorio_plotagens_parciais
         )
 
