@@ -217,8 +217,5 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Legacy generated atmospheric dispersion fields
-dados_simulacao/
-
 # Partial atmospheric dispersion data
 dados_parciais/

@@ -22,8 +22,11 @@ if __name__ == "__main__":
     scenario = TemporalScenario(config)
 
     concentracoes_xy = None
+    vmax_referencia = None
 
     lista_puffs: List[Puff] = []
+    
+    ultimo_angulo = 0
 
     for evento in range(config.total_eventos):
 
@@ -36,7 +39,16 @@ if __name__ == "__main__":
 
         atividade_emitida = config.emissao_teste_fixo
         velocidade_vento = config.vento_teste_fixo
-        angulo_vento_variante_teste = config.angulo_teste_fixo + evento*0
+        
+        if evento / config.total_eventos < 0.25:
+            ultimo_angulo = ultimo_angulo + 2
+        elif evento / config.total_eventos < 0.5:
+            ultimo_angulo = ultimo_angulo - 2
+        elif evento / config.total_eventos < 0.75:
+            ultimo_angulo = ultimo_angulo + 2
+        else:
+            ultimo_angulo = ultimo_angulo - 2
+
         classe_estabilidade = config.classe_teste_fixo
 
         puff = Puff(
@@ -44,7 +56,7 @@ if __name__ == "__main__":
             idade = idade,
             atividade_emitida = atividade_emitida,
             velocidade_vento = velocidade_vento,
-            angulo_vento = angulo_vento_variante_teste,
+            angulo_vento = ultimo_angulo,
             classe_estabilidade = classe_estabilidade
         )
 
@@ -74,6 +86,7 @@ if __name__ == "__main__":
             )
 
         if concentracoes_xy is not None:
+            vmax_referencia = float(np.max(concentracoes_xy))
             print("Campo resultante acumulado com sucesso\n")
             plotting.apresentar_maximo_campo(
                 concentracoes_xy,
@@ -83,7 +96,8 @@ if __name__ == "__main__":
             plotting.plotar_campo_acumulado(
                 concentracoes_xy,
                 eixo_x,
-                eixo_y
+                eixo_y,
+                vmax_referencia
             )
 
         fim_clock_1 = datetime.now()
@@ -91,7 +105,13 @@ if __name__ == "__main__":
         print(f"Fim 1 : {fim_clock_1.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"Tempo de processamento 1 : {fim_1 - inicio:.2f} segundos")   
 
-    if config.simular_evolucao_temporal:
+    if config.simular_evolucao_temporal and vmax_referencia is None:
+        print(
+            "A evolução temporal requer a simulação acumulada para definir "
+            "o vmax de referência. Habilite simular_acumulacao_resultante."
+        )
+
+    if config.simular_evolucao_temporal and vmax_referencia is not None:
 
         for evento in range(config.total_eventos):
 
@@ -141,7 +161,8 @@ if __name__ == "__main__":
                 eixo_y,
                 evento + 1,
                 exibir_maximo=False,
-                campo_acumulado=False
+                campo_acumulado=False,
+                vmax_referencia=vmax_referencia,
             )
 
         fim_clock_2 = datetime.now()
