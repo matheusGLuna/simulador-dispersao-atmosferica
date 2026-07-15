@@ -27,8 +27,8 @@ if __name__ == "__main__":
     vmax_referencia = None
 
     lista_puffs: List[Puff] = []
-    
-    ultimo_angulo = 0
+
+    amplitude_variacao_angular = 10.0
 
     for evento in range(config.total_eventos):
 
@@ -42,14 +42,22 @@ if __name__ == "__main__":
         atividade_emitida = config.emissao_teste_fixo
         velocidade_vento = config.vento_teste_fixo
         
-        if evento / config.total_eventos < 0.25:
-            ultimo_angulo = ultimo_angulo + 2
-        elif evento / config.total_eventos < 0.5:
-            ultimo_angulo = ultimo_angulo - 2
-        elif evento / config.total_eventos < 0.75:
-            ultimo_angulo = ultimo_angulo + 2
-        else:
-            ultimo_angulo = ultimo_angulo - 2
+        progresso = (
+            evento / (config.total_eventos - 1)
+            if config.total_eventos > 1
+            else 0.0
+        )
+        angulo_vento_evento = np.interp(
+            progresso,
+            [0.0, 0.25, 0.50, 0.75, 1.0],
+            [
+                0.0,
+                amplitude_variacao_angular,
+                -amplitude_variacao_angular,
+                amplitude_variacao_angular,
+                0.0,
+            ],
+        )
 
         classe_estabilidade = config.classe_teste_fixo
 
@@ -58,7 +66,7 @@ if __name__ == "__main__":
             idade = idade,
             atividade_emitida = atividade_emitida,
             velocidade_vento = velocidade_vento,
-            angulo_vento = ultimo_angulo,
+            angulo_vento=angulo_vento_evento,
             classe_estabilidade = classe_estabilidade
         )
 
