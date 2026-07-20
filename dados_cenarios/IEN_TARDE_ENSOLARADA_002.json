@@ -1,0 +1,409 @@
+{
+  "metadados": {
+    "cenario_id": "IEN_TARDE_ENSOLARADA_002",
+    "descricao_cenario": "Acidente hipotético de pequena escala no IEN, entre 06:00 e 18:00, com emissão decrescente de I-131 e evolução meteorológica diurna contínua.",
+    "local": "Instituto de Engenharia Nuclear - Ilha do Fundão - Rio de Janeiro - RJ",
+    "latitude": -22.865567878788333,
+    "longitude": -43.22670557195911,
+    "orientacao_eixo_x": "Leste geográfico",
+    "horario_inicio": "06:00",
+    "horario_fim": "18:00",
+    "duracao_total_s": 43200,
+    "N": 48,
+    "delta_t_s": 900,
+    "isotopo": "I-131",
+    "atividade_total_Ci": 120.0,
+    "tipo_terreno": "rural",
+    "descricao_meteorologica": "Cenário sintético climatologicamente condicionado para o IEN, com referência metodológica à reanálise horária ERA5 disponibilizada pela API histórica Open-Meteo, período de 2023-01-01 a 2024-12-31, ano completo, horário local America/Sao_Paulo e filtragem conceitual de dias ensolarados sem precipitação relevante. A documentação e a disponibilidade das variáveis horárias de vento a 10 m, radiação solar e precipitação foram consultadas; entretanto, a série numérica histórica não pôde ser transferida pelo ambiente de execução. Para evitar interrupção da solicitação, foi empregada uma série sintética contínua e fisicamente plausível em resolução de 15 minutos, sem alegar que um dia histórico medóide específico tenha sido efetivamente calculado. As classes foram atribuídas de modo compatível com os intervalos diurnos do método SRDT da EPA.",
+    "perfil_emissao": "Vazamento inicialmente mais intenso, seguido de redução gradual após o início das ações de contenção, com pequenas oscilações suaves preservando a tendência de decaimento.",
+    "modelo_gerador": "GPT-5.6 Thinking",
+    "versao_roteiro": "1.1",
+    "data_geracao": "2026-07-20"
+  },
+  "eventos": [
+    {
+      "evento": 0,
+      "idade": 43200,
+      "atividade_emitida": 5.637573,
+      "velocidade_vento": 1.45,
+      "angulo_vento": 136.0,
+      "classe_estabilidade": "D"
+    },
+    {
+      "evento": 1,
+      "idade": 42300,
+      "atividade_emitida": 5.475265,
+      "velocidade_vento": 1.566,
+      "angulo_vento": 137.502,
+      "classe_estabilidade": "D"
+    },
+    {
+      "evento": 2,
+      "idade": 41400,
+      "atividade_emitida": 5.306029,
+      "velocidade_vento": 1.67,
+      "angulo_vento": 138.935,
+      "classe_estabilidade": "D"
+    },
+    {
+      "evento": 3,
+      "idade": 40500,
+      "atividade_emitida": 5.123147,
+      "velocidade_vento": 1.752,
+      "angulo_vento": 140.241,
+      "classe_estabilidade": "D"
+    },
+    {
+      "evento": 4,
+      "idade": 39600,
+      "atividade_emitida": 4.925023,
+      "velocidade_vento": 1.81,
+      "angulo_vento": 141.379,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 5,
+      "idade": 38700,
+      "atividade_emitida": 4.714899,
+      "velocidade_vento": 1.847,
+      "angulo_vento": 142.333,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 6,
+      "idade": 37800,
+      "atividade_emitida": 4.499447,
+      "velocidade_vento": 1.872,
+      "angulo_vento": 143.11,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 7,
+      "idade": 36900,
+      "atividade_emitida": 4.286703,
+      "velocidade_vento": 1.893,
+      "angulo_vento": 143.741,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 8,
+      "idade": 36000,
+      "atividade_emitida": 4.083905,
+      "velocidade_vento": 1.92,
+      "angulo_vento": 144.273,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 9,
+      "idade": 35100,
+      "atividade_emitida": 3.895814,
+      "velocidade_vento": 1.958,
+      "angulo_vento": 144.758,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 10,
+      "idade": 34200,
+      "atividade_emitida": 3.723873,
+      "velocidade_vento": 2.007,
+      "angulo_vento": 145.249,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 11,
+      "idade": 33300,
+      "atividade_emitida": 3.566349,
+      "velocidade_vento": 2.063,
+      "angulo_vento": 145.787,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 12,
+      "idade": 32400,
+      "atividade_emitida": 3.419305,
+      "velocidade_vento": 2.118,
+      "angulo_vento": 146.395,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 13,
+      "idade": 31500,
+      "atividade_emitida": 3.278068,
+      "velocidade_vento": 2.167,
+      "angulo_vento": 147.074,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 14,
+      "idade": 30600,
+      "atividade_emitida": 3.138739,
+      "velocidade_vento": 2.207,
+      "angulo_vento": 147.807,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 15,
+      "idade": 29700,
+      "atividade_emitida": 2.999337,
+      "velocidade_vento": 2.241,
+      "angulo_vento": 148.559,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 16,
+      "idade": 28800,
+      "atividade_emitida": 2.860285,
+      "velocidade_vento": 2.275,
+      "angulo_vento": 149.286,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 17,
+      "idade": 27900,
+      "atividade_emitida": 2.724172,
+      "velocidade_vento": 2.318,
+      "angulo_vento": 149.945,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 18,
+      "idade": 27000,
+      "atividade_emitida": 2.594884,
+      "velocidade_vento": 2.378,
+      "angulo_vento": 150.503,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 19,
+      "idade": 26100,
+      "atividade_emitida": 2.476412,
+      "velocidade_vento": 2.459,
+      "angulo_vento": 150.941,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 20,
+      "idade": 25200,
+      "atividade_emitida": 2.371662,
+      "velocidade_vento": 2.561,
+      "angulo_vento": 151.265,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 21,
+      "idade": 24300,
+      "atividade_emitida": 2.281593,
+      "velocidade_vento": 2.674,
+      "angulo_vento": 151.502,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 22,
+      "idade": 23400,
+      "atividade_emitida": 2.204899,
+      "velocidade_vento": 2.789,
+      "angulo_vento": 151.699,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 23,
+      "idade": 22500,
+      "atividade_emitida": 2.13829,
+      "velocidade_vento": 2.892,
+      "angulo_vento": 151.916,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 24,
+      "idade": 21600,
+      "atividade_emitida": 2.077259,
+      "velocidade_vento": 2.974,
+      "angulo_vento": 152.217,
+      "classe_estabilidade": "B"
+    },
+    {
+      "evento": 25,
+      "idade": 20700,
+      "atividade_emitida": 2.017115,
+      "velocidade_vento": 3.03,
+      "angulo_vento": 152.661,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 26,
+      "idade": 19800,
+      "atividade_emitida": 1.954008,
+      "velocidade_vento": 3.061,
+      "angulo_vento": 153.291,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 27,
+      "idade": 18900,
+      "atividade_emitida": 1.885675,
+      "velocidade_vento": 3.077,
+      "angulo_vento": 154.128,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 28,
+      "idade": 18000,
+      "atividade_emitida": 1.811765,
+      "velocidade_vento": 3.088,
+      "angulo_vento": 155.169,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 29,
+      "idade": 17100,
+      "atividade_emitida": 1.733669,
+      "velocidade_vento": 3.104,
+      "angulo_vento": 156.385,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 30,
+      "idade": 16200,
+      "atividade_emitida": 1.65396,
+      "velocidade_vento": 3.133,
+      "angulo_vento": 157.726,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 31,
+      "idade": 15300,
+      "atividade_emitida": 1.575615,
+      "velocidade_vento": 3.178,
+      "angulo_vento": 159.129,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 32,
+      "idade": 14400,
+      "atividade_emitida": 1.501225,
+      "velocidade_vento": 3.234,
+      "angulo_vento": 160.529,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 33,
+      "idade": 13500,
+      "atividade_emitida": 1.432409,
+      "velocidade_vento": 3.194,
+      "angulo_vento": 161.866,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 34,
+      "idade": 12600,
+      "atividade_emitida": 1.369544,
+      "velocidade_vento": 3.152,
+      "angulo_vento": 163.097,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 35,
+      "idade": 11700,
+      "atividade_emitida": 1.311865,
+      "velocidade_vento": 3.104,
+      "angulo_vento": 164.198,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 36,
+      "idade": 10800,
+      "atividade_emitida": 1.257849,
+      "velocidade_vento": 3.05,
+      "angulo_vento": 165.171,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 37,
+      "idade": 9900,
+      "atividade_emitida": 1.205777,
+      "velocidade_vento": 2.992,
+      "angulo_vento": 166.035,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 38,
+      "idade": 9000,
+      "atividade_emitida": 1.154274,
+      "velocidade_vento": 2.939,
+      "angulo_vento": 166.829,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 39,
+      "idade": 8100,
+      "atividade_emitida": 1.102715,
+      "velocidade_vento": 2.897,
+      "angulo_vento": 167.597,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 40,
+      "idade": 7200,
+      "atividade_emitida": 1.051365,
+      "velocidade_vento": 2.873,
+      "angulo_vento": 168.384,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 41,
+      "idade": 6300,
+      "atividade_emitida": 1.001262,
+      "velocidade_vento": 2.867,
+      "angulo_vento": 169.222,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 42,
+      "idade": 5400,
+      "atividade_emitida": 0.953873,
+      "velocidade_vento": 2.872,
+      "angulo_vento": 170.128,
+      "classe_estabilidade": "C"
+    },
+    {
+      "evento": 43,
+      "idade": 4500,
+      "atividade_emitida": 0.910647,
+      "velocidade_vento": 2.88,
+      "angulo_vento": 171.096,
+      "classe_estabilidade": "D"
+    },
+    {
+      "evento": 44,
+      "idade": 3600,
+      "atividade_emitida": 0.872582,
+      "velocidade_vento": 2.877,
+      "angulo_vento": 172.102,
+      "classe_estabilidade": "D"
+    },
+    {
+      "evento": 45,
+      "idade": 2700,
+      "atividade_emitida": 0.839932,
+      "velocidade_vento": 2.853,
+      "angulo_vento": 173.103,
+      "classe_estabilidade": "D"
+    },
+    {
+      "evento": 46,
+      "idade": 1800,
+      "atividade_emitida": 0.812112,
+      "velocidade_vento": 2.804,
+      "angulo_vento": 174.05,
+      "classe_estabilidade": "D"
+    },
+    {
+      "evento": 47,
+      "idade": 900,
+      "atividade_emitida": 0.78783,
+      "velocidade_vento": 2.73,
+      "angulo_vento": 174.89,
+      "classe_estabilidade": "D"
+    }
+  ]
+}

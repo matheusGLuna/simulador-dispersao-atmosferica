@@ -1,0 +1,794 @@
+INSTRUÇÕES GERAIS
+
+As instruções deste arquivo são de caráter generalista e definem a sintaxe, os domínios e as regras do produto esperado: um arquivo JSON contendo metadados do cenário e uma lista de atributos relativos a eventos consecutivos de emissão de jatos puff radioativos.
+
+Estas instruções deverão sempre ser acompanhadas por um segundo arquivo contendo as informações específicas do cenário desejado, denominado neste documento como 'Gaussian Puff Model - roteiro LLM - geração cenario - complementar'.
+
+O arquivo complementar deverá informar, no mínimo:
+
+Identificador desejado para o cenário.
+Geolocalização do cenário;
+Orientação do eixo X do modelo;
+Horário inicial e final do acidente;
+Número total de eventos N;
+Intervalo delta_t entre eventos;
+Condições meteorológicas gerais;
+Isótopo de interesse;
+Atividade radioativa total a ser distribuída entre os eventos;
+
+Caso o arquivo complementar não seja fornecido, ou caso alguma informação indispensável esteja ausente, solicite ao usuário os dados faltantes antes de gerar o JSON.
+
+A inteligência artificial não deverá determinar livremente o montante total de atividade radioativa liberada. A atividade total deverá ser informada no arquivo complementar ou definida explicitamente pelo solicitante. A inteligência artificial será responsável apenas por distribuir essa atividade entre os eventos, conforme um perfil temporal fisicamente plausível para o cenário.
+
+Cada objeto da lista “eventos” representa as condições existentes no instante de emissão de um único puff.
+
+Após a criação do objeto Puff, os atributos “velocidade_vento”, “angulo_vento” e “classe_estabilidade” associados ao evento permanecerão constantes durante toda a vida daquele puff, conforme a hipótese simplificadora adotada no modelo computacional.
+
+O JSON produzido deverá conter duas partes:
+
+Um objeto denominado “metadados”, contendo as informações gerais do cenário;
+Uma lista denominada “eventos”, contendo exatamente N objetos Puff.
+
+FORMATO GERAL DO JSON
+
+A estrutura geral deverá seguir este formato:
+
+{
+"metadados": {
+...
+},
+"eventos": [
+...
+]
+}
+
+CABEÇALHO DE METADADOS
+
+O objeto “metadados” deverá conter os seguintes atributos:
+
+“cenario_id”
+
+String utilizada para identificar de forma única o cenário.
+
+O identificador deverá ser informado no arquivo complementar. Caso não seja informado, deverá ser criado de forma curta e descritiva, sem espaços e sem caracteres especiais.
+
+Exemplo:
+
+"IEN_TARDE_ENSOLARADA_001"
+
+“descricao_cenario”
+
+String contendo uma descrição breve do cenário atmosférico e acidental simulado.
+
+Exemplo:
+
+"Acidente hipotético vespertino no IEN, com duração de 6 horas, vento fraco e emissão decrescente de Iodo-131."
+
+“local”
+
+String contendo o nome da instalação e da região geográfica simulada.
+
+Exemplo:
+
+"Instituto de Engenharia Nuclear - Ilha do Fundão - Rio de Janeiro - RJ"
+
+“latitude”
+
+Número real que representa a latitude da geolocalização informada.
+
+Exemplo:
+
+-22.865567878788333
+
+“longitude”
+
+Número real que representa a longitude da geolocalização informada.
+
+Exemplo:
+
+-43.22670557195911
+
+“orientacao_eixo_x”
+
+String que descreve a orientação do eixo X positivo do modelo computacional.
+
+Exemplo:
+
+"Leste geográfico"
+
+“horario_inicio”
+
+String no formato HH, indicando o horário de início do acidente.
+
+Exemplo:
+
+"12:00"
+
+“horario_fim”
+
+String no formato HH, indicando o horário final do acidente.
+
+Exemplo:
+
+"18:00"
+
+“duracao_total_s”
+
+Número inteiro positivo que representa a duração total do cenário em segundos.
+
+A duração deverá obedecer à relação:
+
+duracao_total_s = N * delta_t_s
+
+“N”
+
+Número inteiro positivo que representa o número total de eventos Puff gerados.
+
+“delta_t_s”
+
+Número inteiro positivo que representa, em segundos, o intervalo entre duas emissões Puff consecutivas.
+
+“isotopo”
+
+String que identifica o radionuclídeo considerado.
+
+Exemplo:
+
+"I-131"
+
+“atividade_total_Ci”
+
+Número real não negativo que representa a atividade radioativa total, em Curie, distribuída entre todos os eventos Puff.
+
+Deverá ser obedecida a relação:
+
+soma de atividade_emitida de todos os eventos = atividade_total_Ci
+
+Pequenas diferenças decorrentes de arredondamento serão permitidas apenas se forem inferiores à precisão decimal adotada no JSON.
+
+“tipo_terreno”
+
+String que identifica o tipo de terreno utilizado na parametrização das classes de estabilidade e dos coeficientes de dispersão.
+
+Para este trabalho, o valor esperado será:
+
+"rural"
+
+“descricao_meteorologica”
+
+String contendo um resumo das condições atmosféricas informadas no arquivo complementar.
+
+Exemplo:
+
+"Tarde ensolarada, com vento fraco, baixa variabilidade direcional e evolução gradual da estabilidade atmosférica."
+
+“perfil_emissao”
+
+String contendo uma descrição resumida do perfil temporal adotado para a atividade emitida.
+
+Exemplos:
+
+"Emissão inicialmente elevada, seguida de redução gradual."
+
+"Emissão aproximadamente constante durante todo o acidente."
+
+"Emissão crescente nas primeiras duas horas, seguida de estabilização e contenção."
+
+“modelo_gerador”
+
+String que identifica a LLM utilizada para produzir o cenário.
+
+Quando conhecida, deverá conter o nome do modelo utilizado.
+
+Exemplo:
+
+"ChatGPT - modo de raciocínio alto"
+
+“versao_roteiro”
+
+String que identifica a versão destas instruções.
+
+Exemplo:
+
+"1.0"
+
+“data_geracao”
+
+String contendo a data em que o JSON foi gerado, no formato AAAA-MM-DD.
+
+FORMATO E SINTAXE DA LISTA “EVENTOS”
+
+A lista “eventos” deverá conter exatamente N objetos.
+
+Todos os objetos deverão conter os mesmos atributos, na seguinte ordem obrigatória:
+
+“evento”
+“idade”
+“atividade_emitida”
+“velocidade_vento”
+“angulo_vento”
+“classe_estabilidade”
+
+Nenhum atributo adicional deverá ser incluído nos objetos da lista “eventos”.
+
+1 - ATRIBUTO “evento”
+
+O atributo “evento” deverá ser um número inteiro no intervalo de 0 até N - 1, sendo N o número total de jatos puff discretos gerados para o cenário.
+
+Regras:
+
+O primeiro elemento da lista deverá ter:
+
+“evento”: 0
+
+O último elemento da lista deverá ter:
+
+“evento”: N - 1
+
+Os valores deverão ser sequenciais, sem repetições e sem intervalos.
+
+A lista deverá estar ordenada de forma crescente pelo atributo “evento”.
+
+Domínio:
+
+0 <= evento <= N - 1
+
+Exemplo para N = 12:
+
+0, 1, 2, 3, ..., 11
+
+2 - ATRIBUTO “idade”
+
+O atributo “idade” deverá ser um número inteiro positivo que representa, em segundos, o tempo decorrido entre a emissão do puff e o instante final de avaliação do cenário.
+
+A lista deverá estar ordenada do puff mais antigo para o puff mais recente.
+
+A idade de cada puff deverá ser calculada por:
+
+idade = (N - evento) * delta_t
+
+Onde:
+
+N é o número total de puffs do cenário;
+
+evento é o índice do puff na lista;
+
+delta_t é o intervalo, em segundos, entre duas emissões consecutivas.
+
+Convenção temporal adotada:
+
+O evento 0 representa o primeiro puff emitido.
+
+O evento 1 representa o segundo puff emitido.
+
+O evento N - 1 representa o último puff emitido.
+
+O campo final será avaliado após o término do último intervalo delta_t. Por essa razão, o puff mais recente terá idade igual a delta_t, e nunca idade igual a zero.
+
+Regras:
+
+O puff de evento 0 será o mais antigo e terá a maior idade.
+
+O puff de evento N - 1 será o mais recente e terá idade igual a delta_t.
+
+As idades deverão diminuir exatamente delta_t segundos entre dois eventos consecutivos.
+
+Nunca deverá existir um puff com idade igual a zero.
+
+Todos os valores de idade deverão ser múltiplos inteiros de delta_t.
+
+Relação entre eventos consecutivos:
+
+idade_do_evento_seguinte = idade_do_evento_atual - delta_t
+
+Domínio:
+
+delta_t <= idade <= N * delta_t
+
+Exemplo para:
+
+N = 12
+
+delta_t = 300 segundos
+
+Os valores deverão ser:
+
+evento 0 -> idade 3600
+
+evento 1 -> idade 3300
+
+evento 2 -> idade 3000
+
+evento 3 -> idade 2700
+
+evento 4 -> idade 2400
+
+evento 5 -> idade 2100
+
+evento 6 -> idade 1800
+
+evento 7 -> idade 1500
+
+evento 8 -> idade 1200
+
+evento 9 -> idade 900
+
+evento 10 -> idade 600
+
+evento 11 -> idade 300
+
+3 - ATRIBUTO “atividade_emitida”
+
+O atributo “atividade_emitida” deverá ser um número real não negativo que representa a atividade radioativa total emitida pelo puff para o isótopo de interesse.
+
+A atividade será interpretada pelo modelo computacional como sendo dada sempre em Ci, Curie.
+
+Cada valor representa uma atividade total associada ao puff, e não uma taxa de emissão em Ci/s.
+
+Domínio:
+
+0.0 <= atividade_emitida <= atividade_total_Ci
+
+A soma das atividades emitidas por todos os eventos deverá ser igual ao valor “atividade_total_Ci” informado nos metadados:
+
+soma de atividade_emitida de todos os eventos = atividade_total_Ci
+
+A inteligência artificial deverá distribuir a atividade total entre os N eventos de maneira coerente com as características do vazamento descritas no arquivo complementar.
+
+A evolução entre eventos consecutivos deverá apresentar continuidade temporal. Não deverão ser geradas oscilações aleatórias abruptas sem justificativa física.
+
+O perfil poderá apresentar, conforme o cenário solicitado:
+
+Emissão inicialmente elevada seguida de redução gradual;
+Crescimento inicial seguido de um patamar;
+Pico de emissão seguido de contenção;
+Emissão aproximadamente constante;
+Pequenas flutuações ao redor de uma tendência principal.
+
+Caso seja permitido um valor igual a zero, esse valor representará um intervalo sem emissão radioativa relevante. O objeto deverá permanecer na lista para preservar a discretização temporal do cenário.
+
+O montante absoluto total não deverá ser criado livremente pela LLM. Ele deverá ser obtido do atributo “atividade_total_Ci”, informado pelo solicitante.
+
+Exemplo para N = 12 e atividade total previamente definida:
+
+evento 0 -> 20.0
+
+evento 1 -> 18.5
+
+evento 2 -> 16.6
+
+evento 3 -> 15.0
+
+...
+
+evento 10 -> 11.5
+
+evento 11 -> 10.0
+
+Os valores acima são apenas ilustrativos e deverão ser normalizados para que a soma corresponda exatamente à atividade total definida para o cenário.
+
+4 - ATRIBUTO “velocidade_vento”
+
+O atributo “velocidade_vento” deverá ser um número real positivo que representa o módulo da velocidade do vento no instante de emissão do evento Puff.
+
+A velocidade será interpretada pelo modelo computacional como sendo dada sempre em m/s, metros por segundo.
+
+Domínio:
+
+velocidade_minima_modelo <= velocidade_vento <= valor_maximo_coerente_com_o_cenario
+
+A velocidade mínima aceita deverá ser maior que zero.
+
+Não deverá ser utilizado valor igual a 0.0, pois a ausência total de deslocamento pode produzir problemas físicos ou numéricos no cálculo da distância percorrida e dos coeficientes de dispersão.
+
+Caso o arquivo complementar não forneça um limite mínimo operacional, deverá ser adotado um valor pequeno, positivo e fisicamente justificável, evitando velocidades exatamente nulas.
+
+O módulo do vento deverá variar entre eventos consecutivos de maneira compatível com o comportamento natural esperado para o cenário atmosférico proposto.
+
+A sequência deverá possuir persistência temporal. O valor de um evento deverá estar relacionado ao valor do evento anterior, evitando sorteios independentes e mudanças abruptas sem justificativa.
+
+Em um cenário de vento calmo e relativamente persistente, são esperadas variações pequenas entre eventos consecutivos.
+
+Em cenários mais turbulentos ou associados a mudanças meteorológicas, poderão ocorrer variações maiores, desde que progressivas e coerentes com a descrição geral.
+
+A velocidade do vento não deverá ser definida apenas com base na classe de estabilidade. Horário, insolação, cobertura de nuvens, características locais e descrição meteorológica também deverão ser considerados.
+
+Exemplo para:
+
+N = 12
+
+Manhã de um dia ensolarado com vento fraco e comportamento relativamente persistente:
+
+evento 0 -> 0.5
+
+evento 1 -> 0.6
+
+evento 2 -> 0.9
+
+evento 3 -> 1.0
+
+evento 4 -> 1.1
+
+evento 5 -> 0.8
+
+evento 6 -> 0.7
+
+...
+
+evento 10 -> 1.2
+
+evento 11 -> 1.1
+
+5 - ATRIBUTO “angulo_vento”
+
+O atributo “angulo_vento” deverá ser um número real não negativo que representa a direção para a qual o puff será transportado pelo vento no instante de sua emissão.
+
+O atributo não representa a direção meteorológica de onde o vento se origina. Ele representa diretamente a direção vetorial do deslocamento do centro geométrico do puff.
+
+O valor será interpretado pelo modelo computacional como sendo dado em graus, no intervalo de 0 até menos de 360 graus.
+
+A referência angular deverá seguir estas convenções:
+
+0 graus = direção do eixo X positivo do modelo;
+
+90 graus = direção do eixo Y positivo do modelo;
+
+180 graus = direção do eixo X negativo do modelo;
+
+270 graus = direção do eixo Y negativo do modelo.
+
+Para o cenário do Instituto de Engenharia Nuclear, quando o eixo X positivo estiver orientado para o leste geográfico:
+
+0 graus = leste;
+
+90 graus = norte;
+
+180 graus = oeste;
+
+270 graus = sul.
+
+Os ângulos deverão crescer no sentido anti-horário.
+
+As componentes cartesianas do vento serão posteriormente calculadas pelo modelo computacional por:
+
+u_x = velocidade_vento * cos(angulo_vento)
+
+u_y = velocidade_vento * sin(angulo_vento)
+
+O código será responsável por converter o valor de graus para radianos antes de aplicar seno e cosseno.
+
+Domínio:
+
+0.0 <= angulo_vento < 360.0
+
+A sequência angular deverá variar de maneira fisicamente compatível com o cenário atmosférico solicitado.
+
+As alterações entre eventos consecutivos deverão possuir continuidade temporal e não deverão apresentar mudanças abruptas sem justificativa meteorológica.
+
+A periodicidade angular deverá ser considerada corretamente.
+
+Exemplo:
+
+Uma transição de 359 graus para 1 grau representa uma alteração de apenas 2 graus, e não uma alteração abrupta de 358 graus.
+
+Em dias de vento persistente, são esperadas pequenas oscilações em torno de uma direção predominante.
+
+Em cenários de mudança gradual da direção do vento, a sequência poderá apresentar uma tendência de rotação progressiva.
+
+Exemplo para:
+
+N = 12
+
+Manhã de um dia ensolarado com vento relativamente persistente:
+
+evento 0 -> 45.0
+
+evento 1 -> 45.6
+
+evento 2 -> 46.9
+
+evento 3 -> 47.0
+
+evento 4 -> 46.9
+
+evento 5 -> 45.6
+
+evento 6 -> 45.7
+
+...
+
+evento 10 -> 40.0
+
+evento 11 -> 39.8
+
+6 - ATRIBUTO “classe_estabilidade”
+
+O atributo “classe_estabilidade” deverá ser uma string contendo um único caractere alfabético maiúsculo.
+
+Esse atributo representa a classe de estabilidade atmosférica de Pasquill-Gifford utilizada no modelo de dispersão.
+
+Para este trabalho será adotado terreno rural.
+
+Em conjunto com os coeficientes de dispersão definidos a partir das parametrizações utilizadas no modelo, a classe de estabilidade será empregada no cálculo da dispersão horizontal e vertical do puff.
+
+A classe de estabilidade deverá ser escolhida de maneira coerente com o cenário meteorológico descrito no arquivo complementar.
+
+A escolha deverá considerar, quando essas informações estiverem disponíveis:
+
+Período diurno ou noturno;
+Horário do dia;
+Intensidade da insolação;
+Cobertura de nuvens;
+Velocidade do vento;
+Evolução meteorológica ao longo do período;
+Condição geral de estabilidade ou instabilidade solicitada.
+
+A classe de estabilidade não deverá ser escolhida apenas com base na variabilidade do módulo ou da direção do vento.
+
+As classes deverão variar com continuidade temporal. Transições abruptas entre classes muito distantes deverão ser evitadas, salvo quando houver uma mudança meteorológica explicitamente descrita no cenário.
+
+Por exemplo, deverá ser evitada uma sequência como:
+
+F -> A -> F -> B
+
+em intervalos curtos, quando não houver justificativa meteorológica.
+
+Transições graduais como estas são preferíveis:
+
+F -> E -> D -> C
+
+C -> D -> E
+
+D -> C -> B
+
+Domínio:
+
+"A" = muito instável
+
+"B" = moderadamente instável
+
+"C" = levemente instável
+
+"D" = neutra
+
+"E" = levemente estável
+
+"F" = muito estável
+
+Somente os valores "A", "B", "C", "D", "E" ou "F" serão aceitos.
+
+Exemplo para:
+
+N = 12
+
+Período com atmosfera variando entre neutra e estável:
+
+evento 0 -> "D"
+
+evento 1 -> "D"
+
+evento 2 -> "C"
+
+evento 3 -> "D"
+
+evento 4 -> "D"
+
+evento 5 -> "E"
+
+evento 6 -> "E"
+
+...
+
+evento 10 -> "D"
+
+evento 11 -> "C"
+
+COERÊNCIA ENTRE OS ATRIBUTOS
+
+Os atributos não deverão ser gerados como séries aleatórias independentes.
+
+As sequências de “velocidade_vento”, “angulo_vento”, “classe_estabilidade” e “atividade_emitida” deverão apresentar tendências temporais coerentes com o cenário complementar.
+
+A atividade emitida deverá seguir a evolução física do vazamento.
+
+A velocidade e a direção do vento deverão apresentar persistência entre eventos consecutivos.
+
+A classe de estabilidade deverá evoluir de acordo com as condições meteorológicas, e não apenas acompanhar diretamente as oscilações do vento.
+
+Pequenas flutuações naturais poderão ser acrescentadas, desde que não destruam a tendência geral do cenário.
+
+A geração deverá privilegiar uma sequência temporal suave e fisicamente interpretável, evitando ruído aleatório excessivo.
+
+VALIDAÇÕES OBRIGATÓRIAS ANTES DA RESPOSTA
+
+Antes de apresentar o JSON, verifique internamente se todas as condições abaixo foram atendidas:
+
+O objeto “metadados” está presente;
+A lista “eventos” está presente;
+A lista contém exatamente N objetos;
+Os eventos estão numerados de 0 até N - 1;
+Não existem eventos repetidos;
+Não existem eventos ausentes;
+Os objetos estão ordenados de forma crescente pelo atributo “evento”;
+Todos os objetos possuem exatamente os seis atributos exigidos;
+A ordem dos atributos é a mesma em todos os objetos;
+As idades obedecem à fórmula definida;
+Nenhuma idade é igual a zero;
+Todas as idades são múltiplas de delta_t;
+A velocidade do vento é sempre maior que zero;
+Todos os ângulos estão no intervalo de 0 até menos de 360 graus;
+A periodicidade angular foi considerada;
+Todas as classes de estabilidade pertencem ao conjunto permitido;
+Todas as atividades emitidas são maiores ou iguais a zero;
+A soma das atividades corresponde ao valor “atividade_total_Ci”;
+Não existem valores null;
+Não existem valores NaN;
+Não existem valores Infinity;
+Não existem strings vazias;
+Não existem atributos adicionais nos objetos da lista “eventos”;
+Não existem comentários dentro do JSON;
+O resultado constitui um JSON sintaticamente válido.
+
+REQUISITOS DA RESPOSTA
+
+Retorne exclusivamente o conteúdo do JSON válido.
+
+Não utilize blocos de código Markdown.
+
+Não escreva ```json antes do conteúdo.
+
+Não escreva ``` depois do conteúdo.
+
+Não inclua explicações, justificativas, observações ou comentários antes ou depois do JSON.
+
+Use exatamente os nomes de atributos especificados.
+
+Utilize ponto como separador decimal.
+
+Não utilize vírgula como separador decimal.
+
+Todos os objetos da lista “eventos” deverão conter todos os atributos.
+
+Não omita eventos para abreviar a resposta.
+
+Não utilize reticências.
+
+Não escreva expressões como “demais eventos seguem o padrão”.
+
+Gere explicitamente todos os N objetos.
+
+ESTRUTURA JSON DE EXEMPLO
+
+O exemplo abaixo representa um cenário com:
+
+N = 12
+
+delta_t = 300 segundos
+
+duracao_total_s = 3600 segundos
+
+atividade_total_Ci = 100.0 Ci
+
+Os valores são exclusivamente ilustrativos.
+
+{
+"metadados": {
+"cenario_id": "IEN_EXEMPLO_001",
+"descricao_cenario": "Cenário hipotético de exemplo com duração de uma hora e emissão decrescente de I-131.",
+"local": "Instituto de Engenharia Nuclear - Ilha do Fundão - Rio de Janeiro - RJ",
+"latitude": -22.865567878788333,
+"longitude": -43.22670557195911,
+"orientacao_eixo_x": "Leste geográfico",
+"horario_inicio": "06:00",
+"horario_fim": "07:00",
+"duracao_total_s": 3600,
+"N": 12,
+"delta_t_s": 300,
+"isotopo": "I-131",
+"atividade_total_Ci": 100.0,
+"tipo_terreno": "rural",
+"descricao_meteorologica": "Período matutino com vento fraco, direção relativamente persistente e atmosfera entre levemente instável e neutra.",
+"perfil_emissao": "Emissão inicialmente mais elevada, seguida de redução gradual.",
+"modelo_gerador": "ChatGPT - modo de raciocínio alto",
+"versao_roteiro": "1.0",
+"data_geracao": "AAAA-MM-DD"
+},
+"eventos": [
+{
+"evento": 0,
+"idade": 3600,
+"atividade_emitida": 12.0,
+"velocidade_vento": 0.7,
+"angulo_vento": 45.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 1,
+"idade": 3300,
+"atividade_emitida": 11.0,
+"velocidade_vento": 0.8,
+"angulo_vento": 46.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 2,
+"idade": 3000,
+"atividade_emitida": 10.0,
+"velocidade_vento": 0.7,
+"angulo_vento": 47.0,
+"classe_estabilidade": "C"
+},
+{
+"evento": 3,
+"idade": 2700,
+"atividade_emitida": 9.5,
+"velocidade_vento": 0.9,
+"angulo_vento": 46.0,
+"classe_estabilidade": "C"
+},
+{
+"evento": 4,
+"idade": 2400,
+"atividade_emitida": 9.0,
+"velocidade_vento": 1.0,
+"angulo_vento": 45.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 5,
+"idade": 2100,
+"atividade_emitida": 8.5,
+"velocidade_vento": 1.2,
+"angulo_vento": 44.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 6,
+"idade": 1800,
+"atividade_emitida": 8.0,
+"velocidade_vento": 1.3,
+"angulo_vento": 43.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 7,
+"idade": 1500,
+"atividade_emitida": 7.5,
+"velocidade_vento": 1.2,
+"angulo_vento": 40.0,
+"classe_estabilidade": "E"
+},
+{
+"evento": 8,
+"idade": 1200,
+"atividade_emitida": 7.0,
+"velocidade_vento": 1.1,
+"angulo_vento": 37.5,
+"classe_estabilidade": "E"
+},
+{
+"evento": 9,
+"idade": 900,
+"atividade_emitida": 6.5,
+"velocidade_vento": 1.0,
+"angulo_vento": 35.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 10,
+"idade": 600,
+"atividade_emitida": 6.0,
+"velocidade_vento": 0.9,
+"angulo_vento": 36.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 11,
+"idade": 300,
+"atividade_emitida": 5.0,
+"velocidade_vento": 1.0,
+"angulo_vento": 37.5,
+"classe_estabilidade": "C"
+}
+]
+}

@@ -160,6 +160,8 @@ if __name__ == "__main__":
                 "1",
                 "-i",
                 str(diretorio_plotagens / "evento_%02d_heatmap_xy.png"),
+                "-vf",
+                "pad=ceil(iw/2)*2:ceil(ih/2)*2",
                 "-c:v",
                 "libx264",
                 "-pix_fmt",

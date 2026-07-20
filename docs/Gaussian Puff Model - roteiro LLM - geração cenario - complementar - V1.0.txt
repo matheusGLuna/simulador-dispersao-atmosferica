@@ -1,0 +1,46 @@
+cenario_id:
+IEN_TARDE_ENSOLARADA_001
+
+geolocalizacao:
+Instituto de Engenharia Nuclear - Ilha do Fundão - Rio de Janeiro - RJ
+
+latitude:
+-22.865567878788333
+
+longitude:
+-43.22670557195911
+
+orientacao_eixo_x:
+Leste geográfico
+
+horario_inicio:
+12:00
+
+horario_fim:
+18:00
+
+N:
+72
+
+delta_t_s:
+300
+
+isotopo:
+I-131
+
+tipo_terreno:
+rural
+
+atividade_total_Ci:
+60.0
+
+condicoes_meteorologicas:
+Tarde ensolarada, com vento fraco a moderado, direção relativamente persistente e pequenas variações entre eventos consecutivos. 
+Considerar evolução gradual da atmosfera ao longo da tarde, partindo de condição levemente instável ou neutra e tendendo à neutralidade ou leve estabilidade próximo ao final do período.
+
+perfil_emissao:
+Vazamento inicialmente mais intenso, seguido de redução gradual após o início das ações de contenção. 
+Manter pequenas oscilações naturais sem alterar a tendência principal de decaimento.
+
+caracteristicas_do_acidente:
+Acidente hipotético de pequena escala em instalação de pesquisa semelhante ao reator Argonauta do IEN.

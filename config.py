@@ -12,15 +12,15 @@ class Config:
     terreno: str = "R"              # R para rural, U para urbano
 
     dim_eixo_x_pos: int = 0         # [m] inteiro >= 1 e multiplo de passo_x
-    dim_eixo_x_neg: int = 30000     # [m] inteiro >= 0 e multiplo de passo_x
-    dim_eixo_y_pos: int = 25000     # [m] inteiro >= 1 e multiplo de passo_y
+    dim_eixo_x_neg: int = 70000     # [m] inteiro >= 0 e multiplo de passo_x
+    dim_eixo_y_pos: int = 60000     # [m] inteiro >= 1 e multiplo de passo_y
     dim_eixo_y_neg: int = 0         # [m] inteiro >= 0 e multiplo de passo_y
     passo_x: int = 100              # [m] inteiro >= 1
     passo_y: int = 100              # [m] inteiro >= 1
     limite_pontos: int = 1002001    # limite de pontos por malha calculada
 
     simular_campo__acumulado: bool = True
-    simular_animacao_temporal: bool = False
+    simular_animacao_temporal: bool = True
 
     gamma: float = 0.3              # 0.3 a 0.6; usado apenas na escala convencional
     usar_escala_logaritmica: bool = True
