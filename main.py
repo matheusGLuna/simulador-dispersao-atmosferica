@@ -25,6 +25,7 @@ if __name__ == "__main__":
     vmax_referencia = None
 
     lista_puffs = scenario_generator.gerar_lista_puffs(config.arquivo_cenario)
+    cenario_id = scenario_generator.cenario_id
     total_eventos = len(lista_puffs)
 
     if config.simular_campo__acumulado:
@@ -60,6 +61,7 @@ if __name__ == "__main__":
                 eixo_y,
                 campo_acumulado=True,
                 vmax_referencia=vmax_referencia,
+                cenario_id=cenario_id,
             )
 
         fim_clock_1 = datetime.now()
@@ -128,6 +130,7 @@ if __name__ == "__main__":
                 evento + 1,
                 campo_acumulado=False,
                 vmax_referencia=vmax_referencia,
+                cenario_id=cenario_id,
             )
 
             print (f"evento {evento} processado")
@@ -139,7 +142,7 @@ if __name__ == "__main__":
 
         diretorio_plotagens = (
             Path(config.diretorio_dados_parciais)
-            / f"cenario{config.seed}"
+            / cenario_id
             / config.diretorio_plotagens_parciais
         )
         arquivo_video = diretorio_plotagens / "evolucao_temporal.mp4"

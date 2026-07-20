@@ -1,5 +1,6 @@
 import json
 import math
+import re
 from pathlib import Path
 
 from config import Config
@@ -30,12 +31,35 @@ class LLMScenarioGenerator:
                 f"O arquivo de cenário contém JSON inválido: {caminho}"
             ) from error
 
-        if not isinstance(dados_cenario, list) or not dados_cenario:
-            raise ValueError("O cenário deve ser uma lista JSON não vazia de puffs")
+        if not isinstance(dados_cenario, dict):
+            raise ValueError(
+                "O cenário deve ser um objeto JSON com metadados e eventos"
+            )
+
+        metadados = dados_cenario.get("metadados")
+        eventos = dados_cenario.get("eventos")
+
+        if not isinstance(metadados, dict):
+            raise ValueError("O cenário deve conter metadados em JSON")
+
+        cenario_id = metadados.get("cenario_id")
+        if (
+            not isinstance(cenario_id, str)
+            or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", cenario_id)
+        ):
+            raise ValueError(
+                "metadados.cenario_id deve conter apenas letras, números, "
+                "hífens e sublinhados"
+            )
+
+        if not isinstance(eventos, list) or not eventos:
+            raise ValueError("eventos deve ser uma lista JSON não vazia de puffs")
+
+        self.cenario_id = cenario_id
 
         lista_puffs = [
             self.criar_puff(dados_puff, indice)
-            for indice, dados_puff in enumerate(dados_cenario)
+            for indice, dados_puff in enumerate(eventos)
         ]
         self.validar_eventos(lista_puffs)
 

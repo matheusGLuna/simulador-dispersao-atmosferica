@@ -17,6 +17,7 @@ def plotar_heatmap_xy(
     evento=None,
     campo_acumulado=False,
     vmax_referencia=None,
+    cenario_id=None,
 ):
     """Plota a concentração no plano XY, ao nível do solo (z = 0)."""
     matrix = concentracoes_xy.transpose()
@@ -82,16 +83,18 @@ def plotar_heatmap_xy(
     )
     cbar.set_label(f"Concentração em {config.unidade}/m³")
 
+    identificador_cenario = cenario_id or f"cenario{config.seed}"
+
     if campo_acumulado:
         output_dir = (
             Path(config.diretorio_dados_acumulados)
-            / f"cenario{config.seed}"
+            / identificador_cenario
             / config.diretorio_plotagens_acumuladas
         )
     else:
         output_dir = (
             Path(config.diretorio_dados_parciais)
-            / f"cenario{config.seed}"
+            / identificador_cenario
             / config.diretorio_plotagens_parciais
         )
 

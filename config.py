@@ -3,32 +3,31 @@ from dataclasses import dataclass
 @dataclass
 class Config:
 
+    arquivo_cenario: str = "dados_cenarios/IEN_TARDE_ENSOLARADA_001.json"
+
     converter_ci_bq: bool = True   # True para converter atividades de entrada em Ci para Bq, False para manter em Ci
     FATOR_CI_PARA_BQ = 3.7e10
 
-    altura_chamine: int = 5         # [m]
+    altura_chamine: int = 10        # [m]
     terreno: str = "R"              # R para rural, U para urbano
 
-    seed: str = "teste"
-
-    dim_eixo_x_pos: int = 4000      # [m] inteiro >= 1 e multiplo de passo_x
-    dim_eixo_x_neg: int = 4000      # [m] inteiro >= 0 e multiplo de passo_x
-    dim_eixo_y_pos: int = 2000      # [m] inteiro >= 1 e multiplo de passo_y
-    dim_eixo_y_neg: int = 2000      # [m] inteiro >= 0 e multiplo de passo_y
-    passo_x: int = 10               # [m] inteiro >= 1
-    passo_y: int = 10               # [m] inteiro >= 1
+    dim_eixo_x_pos: int = 0         # [m] inteiro >= 1 e multiplo de passo_x
+    dim_eixo_x_neg: int = 30000     # [m] inteiro >= 0 e multiplo de passo_x
+    dim_eixo_y_pos: int = 25000     # [m] inteiro >= 1 e multiplo de passo_y
+    dim_eixo_y_neg: int = 0         # [m] inteiro >= 0 e multiplo de passo_y
+    passo_x: int = 100              # [m] inteiro >= 1
+    passo_y: int = 100              # [m] inteiro >= 1
     limite_pontos: int = 1002001    # limite de pontos por malha calculada
 
     simular_campo__acumulado: bool = True
     simular_animacao_temporal: bool = False
 
-    gamma: float = 0.3              # 0.3 a 0.7; usado apenas na escala convencional
+    gamma: float = 0.3              # 0.3 a 0.6; usado apenas na escala convencional
     usar_escala_logaritmica: bool = True
-    vmin_logaritmico: float = 1e-8  # [Ci/m³], independente da unidade de saída
+    vmin_logaritmico: float = 2.702e-11
     exibir_contornos_logaritmicos: bool = True
     quantidade_contornos_logaritmicos: int = 8
-
-    arquivo_cenario: str = "dados_cenarios/cenario_exemplo.txt"
+    
     diretorio_dados_parciais: str = "dados_parciais"
     diretorio_plotagens_parciais: str = "plotagens_parciais"
     diretorio_dados_acumulados: str = "dados_acumulados"
