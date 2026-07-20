@@ -1,6 +1,5 @@
 from pathlib import Path
 from datetime import datetime
-from typing import List
 import shutil
 import subprocess
 import time
@@ -10,8 +9,7 @@ import plotting
 
 from config import Config
 from model import GaussianPuffModel
-from temporal_model import TemporalScenario
-from puff import Puff
+from scenario_generator import LLMScenarioGenerator
 
 if __name__ == "__main__":
 
@@ -21,50 +19,16 @@ if __name__ == "__main__":
 
     config = Config()
     model = GaussianPuffModel(config)
-    scenario = TemporalScenario(config)
+    scenario_generator = LLMScenarioGenerator(config)
 
     concentracoes_xy = None
     vmax_referencia = None
 
-    lista_puffs: List[Puff] = []
-    
-    ultimo_angulo = 0
+    lista_puffs = scenario_generator.gerar_lista_puffs(config.arquivo_cenario)
+    cenario_id = scenario_generator.cenario_id
+    total_eventos = len(lista_puffs)
 
-    for evento in range(config.total_eventos):
-
-        idade = (config.total_eventos - evento) * config.intervalo_tempo_evento
-
-    #    atividade_emitida = scenario.obter_taxa_emissao(evento)
-    #    velocidade_vento = scenario.obter_velocidade_vento(evento)
-    #    angulo_vento = scenario.obter_angulo_vento(evento)
-    #    classe_estabilidade = scenario.obter_classe_estabilidade(evento)
-
-        atividade_emitida = config.emissao_teste_fixo
-        velocidade_vento = config.vento_teste_fixo
-        
-        if evento / config.total_eventos < 0.25:
-            ultimo_angulo = ultimo_angulo + 2
-        elif evento / config.total_eventos < 0.5:
-            ultimo_angulo = ultimo_angulo - 2
-        elif evento / config.total_eventos < 0.75:
-            ultimo_angulo = ultimo_angulo + 2
-        else:
-            ultimo_angulo = ultimo_angulo - 2
-
-        classe_estabilidade = config.classe_teste_fixo
-
-        puff = Puff(
-            evento = evento,
-            idade = idade,
-            atividade_emitida = atividade_emitida,
-            velocidade_vento = velocidade_vento,
-            angulo_vento = ultimo_angulo,
-            classe_estabilidade = classe_estabilidade
-        )
-
-        lista_puffs.append(puff)
-
-    if config.simular_acumulacao_resultante:
+    if config.simular_campo__acumulado:
         
         for puff in lista_puffs:
 
@@ -97,6 +61,7 @@ if __name__ == "__main__":
                 eixo_y,
                 campo_acumulado=True,
                 vmax_referencia=vmax_referencia,
+                cenario_id=cenario_id,
             )
 
         fim_clock_1 = datetime.now()
@@ -104,17 +69,21 @@ if __name__ == "__main__":
         print(f"Fim 1 : {fim_clock_1.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"Tempo de processamento 1 : {fim_1 - inicio:.2f} segundos")   
 
-    if config.simular_evolucao_temporal and vmax_referencia is None:
+    if config.simular_animacao_temporal and vmax_referencia is None:
         print(
-            "A evolução temporal requer a simulação acumulada para definir "
-            "o vmax de referência. Habilite simular_acumulacao_resultante."
+            "A animação temporal requer a execução da simulação do campo acumulado para definir "
+            "o vmax de referência. Habilite simular_campo_acumulado."
         )
 
-    if config.simular_evolucao_temporal and vmax_referencia is not None:
+    if config.simular_animacao_temporal and vmax_referencia is not None:
+        
+        if len(lista_puffs) == 1:
+            raise ValueError("A animação temporal requer um cenario com pelo menos dois eventos puff")
+        else:
+            intervalo_tempo_eventos = lista_puffs[0].idade - lista_puffs[1].idade
 
-        for evento in range(config.total_eventos):
+        for evento in range(total_eventos):
 
-            print (f"evento {evento} sendo processado... ")
             concentracoes_xy = None
 
             for puff in lista_puffs:
@@ -122,7 +91,7 @@ if __name__ == "__main__":
                 if puff.evento > evento:
                     continue
                 
-                idade_instantanea =  (evento - puff.evento + 1) * config.intervalo_tempo_evento
+                idade_instantanea =  (evento - puff.evento + 1) * intervalo_tempo_eventos
                 puff.idade = idade_instantanea
                 sigma_y = model.calcular_sigma_y(puff)
 
@@ -161,7 +130,10 @@ if __name__ == "__main__":
                 evento + 1,
                 campo_acumulado=False,
                 vmax_referencia=vmax_referencia,
+                cenario_id=cenario_id,
             )
+
+            print (f"evento {evento} processado")
 
         fim_clock_2 = datetime.now()
         fim_2 = time.perf_counter()
@@ -170,7 +142,7 @@ if __name__ == "__main__":
 
         diretorio_plotagens = (
             Path(config.diretorio_dados_parciais)
-            / f"cenario{config.seed}"
+            / cenario_id
             / config.diretorio_plotagens_parciais
         )
         arquivo_video = diretorio_plotagens / "evolucao_temporal.mp4"

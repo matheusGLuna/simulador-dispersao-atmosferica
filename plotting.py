@@ -17,17 +17,35 @@ def plotar_heatmap_xy(
     evento=None,
     campo_acumulado=False,
     vmax_referencia=None,
+    cenario_id=None,
 ):
     """Plota a concentração no plano XY, ao nível do solo (z = 0)."""
     matrix = concentracoes_xy.transpose()
     extent = [eixo_x[0], eixo_x[-1], eixo_y[0], eixo_y[-1]]
+    largura_malha = eixo_x[-1] - eixo_x[0]
+    altura_malha = eixo_y[-1] - eixo_y[0]
+    proporcao_malha = largura_malha / altura_malha
+    lado_maior = 10
+
+    if proporcao_malha >= 1:
+        largura_figura = lado_maior
+        altura_mapa = lado_maior / proporcao_malha
+    else:
+        largura_figura = lado_maior * proporcao_malha
+        altura_mapa = lado_maior
+
+    altura_figura = altura_mapa + 1.2
     filename = (
         "campo_resultante_heatmap_xy.png"
         if campo_acumulado
         else f"evento_{evento:02d}_heatmap_xy.png"
     )
 
-    figura, eixo = plt.subplots(figsize=(12, 6), dpi=150)
+    figura, eixo = plt.subplots(
+        figsize=(largura_figura, altura_figura),
+        dpi=150,
+        layout="constrained",
+    )
     imagem = eixo.imshow(
         matrix,
         origin="lower",
@@ -43,7 +61,7 @@ def plotar_heatmap_xy(
 
     if config.usar_escala_logaritmica and config.exibir_contornos_logaritmicos:
         niveis = np.geomspace(
-            config.vmin_logaritmico,
+            config.vmin_logaritmico_efetivo,
             vmax_referencia,
             config.quantidade_contornos_logaritmicos,
         )
@@ -56,26 +74,33 @@ def plotar_heatmap_xy(
             linewidths=0.5,
         )
 
-    cbar = figura.colorbar(imagem, ax=eixo, orientation="horizontal")
+    cbar = figura.colorbar(
+        imagem,
+        ax=eixo,
+        orientation="horizontal",
+        fraction=0.05,
+        pad=0.10,
+    )
     cbar.set_label(f"Concentração em {config.unidade}/m³")
+
+    identificador_cenario = cenario_id or f"cenario{config.seed}"
 
     if campo_acumulado:
         output_dir = (
             Path(config.diretorio_dados_acumulados)
-            / f"cenario{config.seed}"
+            / identificador_cenario
             / config.diretorio_plotagens_acumuladas
         )
     else:
         output_dir = (
             Path(config.diretorio_dados_parciais)
-            / f"cenario{config.seed}"
+            / identificador_cenario
             / config.diretorio_plotagens_parciais
         )
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        figura.tight_layout()
         figura.savefig(output_dir / filename, dpi=150)
     except Exception as error:
         print(f"Falha ao salvar {filename}: {error}")
@@ -98,10 +123,12 @@ def obter_normalizacao(vmax_referencia):
             "A escala logarítmica requer um vmax de referência do campo acumulado"
         )
 
-    if config.vmin_logaritmico <= 0:
+    vmin_logaritmico = config.vmin_logaritmico_efetivo
+
+    if vmin_logaritmico <= 0:
         raise ValueError("vmin_logaritmico deve ser maior que zero")
 
-    if vmax_referencia <= config.vmin_logaritmico:
+    if vmax_referencia <= vmin_logaritmico:
         raise ValueError(
             "O vmax de referência deve ser maior que vmin_logaritmico para "
             "usar escala logarítmica"
@@ -115,4 +142,4 @@ def obter_normalizacao(vmax_referencia):
             "quantidade_contornos_logaritmicos deve ser pelo menos 2"
         )
 
-    return LogNorm(vmin=config.vmin_logaritmico, vmax=vmax_referencia)
+    return LogNorm(vmin=vmin_logaritmico, vmax=vmax_referencia)
