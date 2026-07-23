@@ -1,4 +1,6 @@
 from pathlib import Path
+import shutil
+import subprocess
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -109,8 +111,42 @@ def plotar_heatmap_xy(
             plt.close(figura)
 
 
-def show_heatmap():
-    plt.show()
+def gerar_video_temporal(diretorio_plotagens, fps=10):
+    """Gera o MP4 da sequência de PNGs temporais usando o FFmpeg disponível."""
+    diretorio_plotagens = Path(diretorio_plotagens)
+    arquivo_video = diretorio_plotagens / "evolucao_temporal.mp4"
+    ffmpeg = shutil.which("ffmpeg")
+
+    if ffmpeg is None:
+        print("FFmpeg não encontrado; o vídeo temporal não foi gerado.")
+        return False
+
+    comando_ffmpeg = [
+        ffmpeg,
+        "-y",
+        "-framerate",
+        str(fps),
+        "-start_number",
+        "1",
+        "-i",
+        str(diretorio_plotagens / "evento_%02d_heatmap_xy.png"),
+        "-vf",
+        "pad=ceil(iw/2)*2:ceil(ih/2)*2",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        str(arquivo_video),
+    ]
+
+    try:
+        subprocess.run(comando_ffmpeg, check=True)
+    except subprocess.CalledProcessError as error:
+        print(f"Falha ao gerar o vídeo temporal: {error}")
+        return False
+
+    print(f"Vídeo temporal salvo em: {arquivo_video}")
+    return True
 
 
 def obter_normalizacao(vmax_referencia):
