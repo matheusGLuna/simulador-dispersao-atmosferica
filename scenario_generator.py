@@ -88,7 +88,7 @@ class LLMScenarioGenerator:
         idade = self.validar_inteiro_nao_negativo(
             dados_puff["idade"], "idade", indice
         )
-        atividade_emitida = self.validar_numero_positivo(
+        atividade_emitida = self.validar_numero_nao_negativo(
             dados_puff["atividade_emitida"], "atividade_emitida", indice
         )
         atividade_emitida *= self.config.fator_conversao_atividade
@@ -134,6 +134,17 @@ class LLMScenarioGenerator:
         if valor_validado <= 0:
             raise ValueError(
                 f"{campo} do puff no índice {indice} deve ser maior que zero"
+            )
+        return valor_validado
+
+    @staticmethod
+    def validar_numero_nao_negativo(valor, campo, indice):
+        valor_validado = LLMScenarioGenerator.validar_numero_finito(
+            valor, campo, indice
+        )
+        if valor_validado < 0:
+            raise ValueError(
+                f"{campo} do puff no índice {indice} deve ser maior ou igual a zero"
             )
         return valor_validado
 
