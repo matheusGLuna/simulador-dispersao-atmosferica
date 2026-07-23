@@ -12,11 +12,11 @@ class Config:
     terreno: str = "R"              # R para rural, U para urbano
 
     dim_eixo_x_pos: int = 0         # [m] inteiro >= 1 e multiplo de passo_x
-    dim_eixo_x_neg: int = 25000     # [m] inteiro >= 0 e multiplo de passo_x
-    dim_eixo_y_pos: int = 25000     # [m] inteiro >= 1 e multiplo de passo_y
+    dim_eixo_x_neg: int = 5000      # [m] inteiro >= 0 e multiplo de passo_x
+    dim_eixo_y_pos: int = 5000      # [m] inteiro >= 1 e multiplo de passo_y
     dim_eixo_y_neg: int = 0         # [m] inteiro >= 0 e multiplo de passo_y
-    passo_x: int = 50               # [m] inteiro >= 1
-    passo_y: int = 50               # [m] inteiro >= 1
+    passo_x: int = 5                # [m] inteiro >= 1
+    passo_y: int = 5                # [m] inteiro >= 1
     limite_pontos: int = 1002001    # limite de pontos por malha calculada
 
     gerar_plotagens_temporais: bool = False
@@ -24,13 +24,19 @@ class Config:
 
     gamma: float = 0.3              # 0.3 a 0.6; usado apenas na escala convencional
     usar_escala_logaritmica: bool = True
-    vmin_logaritmico: float = 2.702e-11
+    vmin_logaritmico: float = 2.702e-11    # [Ci]
+    vmin_logaritmico_dose: float = 1.0e-6  # [Sv]
     vmax_animacao: float | None = None  # [Ci/m³]; None usa o máximo global calculado
     exibir_contornos_logaritmicos: bool = True
     quantidade_contornos_logaritmicos: int = 8
+
+    coeficiente_dose_imersao: float = 5.0e-14  # [Sv·m³/(Bq·s)]
+    taxa_respiracao: float = 3.1e-4            # [m³/s]
+    coeficiente_dose_inalacao: float = 1.0e-9  # [Sv/Bq]
     
     diretorio_dados_parciais: str = "dados_parciais"
     diretorio_plotagens_parciais: str = "plotagens_parciais"
+    diretorio_plotagens_dosimetria: str = "plotagens_dosimetria"
 
     @property
     def unidade(self):

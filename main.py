@@ -68,6 +68,8 @@ def main():
         )
         vmax_global_animacao = 0.0
 
+    concentracoes_int_t_xy = np.zeros_like(X, dtype=float)
+
     print(f"Calculando malhas de concentração instantâneas ...")
     for evento in range(total_eventos):
         concentracoes_xy = model.calcular_campo_instantaneo(
@@ -78,6 +80,11 @@ def main():
             X,
             Y,
         )
+        np.add(
+            concentracoes_int_t_xy,
+            concentracoes_xy * intervalo_tempo_eventos,
+            out=concentracoes_int_t_xy,
+        )
 
         if config.gerar_plotagens_temporais:
             campos_temporais[evento] = concentracoes_xy
@@ -85,6 +92,34 @@ def main():
                 vmax_global_animacao,
                 float(np.max(concentracoes_xy)),
             )
+
+    dose_imersao_xy = model.calcular_dose_imersao(concentracoes_int_t_xy)
+    dose_inalacao_xy = model.calcular_dose_inalacao(concentracoes_int_t_xy)
+    vmax_chi_t = float(np.max(concentracoes_int_t_xy))
+    fator_dose_inalacao = (
+        config.taxa_respiracao * config.coeficiente_dose_inalacao
+    )
+
+    plotting.plotar_heatmap_dosimetria(
+        dose_imersao_xy,
+        eixo_x,
+        eixo_y,
+        titulo="Dose efetiva por imersão na pluma",
+        nome_arquivo="dose_imersao_heatmap_xy.png",
+        vmin_cores=config.vmin_logaritmico_dose,
+        vmax_cores=config.coeficiente_dose_imersao * vmax_chi_t,
+        cenario_id=cenario_id,
+    )
+    plotting.plotar_heatmap_dosimetria(
+        dose_inalacao_xy,
+        eixo_x,
+        eixo_y,
+        titulo="Dose efetiva por inalação",
+        nome_arquivo="dose_inalacao_heatmap_xy.png",
+        vmin_cores=config.vmin_logaritmico_dose,
+        vmax_cores=fator_dose_inalacao * vmax_chi_t,
+        cenario_id=cenario_id,
+    )
 
     if config.gerar_plotagens_temporais:
         campos_temporais.flush()
@@ -120,7 +155,7 @@ def main():
                 concentracoes_xy,
                 eixo_x,
                 eixo_y,
-                evento,
+                evento + 1,
                 vmax_cores=vmax_animacao,
                 cenario_id=cenario_id,
             )

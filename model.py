@@ -78,6 +78,18 @@ class GaussianPuffModel:
 
         return concentracoes_xy
 
+    def calcular_dose_imersao(self, concentracoes_int_t_xy):
+        """Calcula a dose efetiva por imersão na pluma [Sv]."""
+        return self.config.coeficiente_dose_imersao * concentracoes_int_t_xy
+
+    def calcular_dose_inalacao(self, concentracoes_int_t_xy):
+        """Calcula a dose efetiva por inalação [Sv]."""
+        fator_inalacao = (
+            self.config.taxa_respiracao
+            * self.config.coeficiente_dose_inalacao
+        )
+        return fator_inalacao * concentracoes_int_t_xy
+
     @staticmethod
     def validar_parametros_malha(limite_positivo, limite_negativo, passo, eixo):
         """Valida limites e espaçamento de um eixo da malha."""
