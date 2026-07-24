@@ -12,17 +12,8 @@ from config import Config
 config = Config()
 
 
-def plotar_heatmap_temporal(
-    concentracoes_xy,
-    eixo_x,
-    eixo_y,
-    evento,
-    vmax_cores,
-    cenario_id,
-):
-    """Salva o heatmap XY de um frame temporal ao nível do solo."""
-    matrix = concentracoes_xy.transpose()
-    extent = [eixo_x[0], eixo_x[-1], eixo_y[0], eixo_y[-1]]
+def criar_layout_mapa_com_barra(eixo_x, eixo_y):
+    """Cria eixos de mapa e barra horizontal com a mesma largura útil."""
     largura_malha = eixo_x[-1] - eixo_x[0]
     altura_malha = eixo_y[-1] - eixo_y[0]
     proporcao_malha = largura_malha / altura_malha
@@ -35,11 +26,33 @@ def plotar_heatmap_temporal(
         largura_figura = lado_maior * proporcao_malha
         altura_mapa = lado_maior
 
-    figura, eixo = plt.subplots(
-        figsize=(largura_figura, altura_mapa + 1.2),
+    figura = plt.figure(
+        figsize=(largura_figura, altura_mapa + 1.6),
         dpi=150,
         layout="constrained",
     )
+    grade = figura.add_gridspec(
+        2,
+        1,
+        height_ratios=[altura_mapa, 0.35],
+    )
+    eixo_mapa = figura.add_subplot(grade[0])
+    eixo_barra = figura.add_subplot(grade[1])
+    return figura, eixo_mapa, eixo_barra
+
+
+def plotar_heatmap_temporal(
+    concentracoes_xy,
+    eixo_x,
+    eixo_y,
+    evento,
+    vmax_cores,
+    cenario_id,
+):
+    """Salva o heatmap XY de um frame temporal ao nível do solo."""
+    matrix = concentracoes_xy.transpose()
+    extent = [eixo_x[0], eixo_x[-1], eixo_y[0], eixo_y[-1]]
+    figura, eixo, eixo_barra = criar_layout_mapa_com_barra(eixo_x, eixo_y)
     imagem = eixo.imshow(
         matrix,
         origin="lower",
@@ -70,10 +83,8 @@ def plotar_heatmap_temporal(
 
     cbar = figura.colorbar(
         imagem,
-        ax=eixo,
+        cax=eixo_barra,
         orientation="horizontal",
-        fraction=0.05,
-        pad=0.10,
     )
     cbar.set_label(f"Concentração em {config.unidade}/m³")
 
@@ -154,23 +165,7 @@ def plotar_heatmap_dosimetria(
     """Salva um mapa XY de dose com a normalização configurada."""
     matrix = campo_dose_xy.transpose()
     extent = [eixo_x[0], eixo_x[-1], eixo_y[0], eixo_y[-1]]
-    largura_malha = eixo_x[-1] - eixo_x[0]
-    altura_malha = eixo_y[-1] - eixo_y[0]
-    proporcao_malha = largura_malha / altura_malha
-    lado_maior = 10
-
-    if proporcao_malha >= 1:
-        largura_figura = lado_maior
-        altura_mapa = lado_maior / proporcao_malha
-    else:
-        largura_figura = lado_maior * proporcao_malha
-        altura_mapa = lado_maior
-
-    figura, eixo = plt.subplots(
-        figsize=(largura_figura, altura_mapa + 1.2),
-        dpi=150,
-        layout="constrained",
-    )
+    figura, eixo, eixo_barra = criar_layout_mapa_com_barra(eixo_x, eixo_y)
     imagem = eixo.imshow(
         matrix,
         origin="lower",
@@ -201,10 +196,8 @@ def plotar_heatmap_dosimetria(
 
     cbar = figura.colorbar(
         imagem,
-        ax=eixo,
+        cax=eixo_barra,
         orientation="horizontal",
-        fraction=0.05,
-        pad=0.10,
     )
     cbar.set_label("Dose efetiva (Sv)")
 

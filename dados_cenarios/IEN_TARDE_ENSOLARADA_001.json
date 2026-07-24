@@ -8,11 +8,11 @@
     "orientacao_eixo_x": "Leste geográfico",
     "horario_inicio": "12:00",
     "horario_fim": "18:00",
-    "duracao_total_s": 21600,
+    "duracao_total_s": 43200,
     "N": 144,
     "delta_t_s": 300,
     "isotopo": "I-131",
-    "atividade_total_Ci": 60.0,
+    "atividade_total_Ci": 21600.0,
     "tipo_terreno": "rural",
     "descricao_meteorologica": "Tarde ensolarada, com vento fraco a moderado, direção relativamente persistente, pequenas variações entre eventos consecutivos e evolução gradual de condição levemente instável para neutra e, ao final, levemente estável.",
     "perfil_emissao": "Vazamento inicialmente mais intenso, seguido de redução gradual após o início das ações de contenção, com pequenas oscilações suaves.",
@@ -23,504 +23,504 @@
   "eventos": [
     {
       "evento": 0,
-      "atividade_emitida": 1.632147,
+      "atividade_emitida": 587.57292,
       "velocidade_vento": 1.2,
       "angulo_vento": 138.0,
       "classe_estabilidade": "D"
     },
     {
       "evento": 1,
-      "atividade_emitida": 1.628122,
+      "atividade_emitida": 586.12392,
       "velocidade_vento": 1.29,
       "angulo_vento": 138.8,
       "classe_estabilidade": "D"
     },
     {
       "evento": 2,
-      "atividade_emitida": 1.609724,
+      "atividade_emitida": 579.50064,
       "velocidade_vento": 1.35,
       "angulo_vento": 139.6,
       "classe_estabilidade": "D"
     },
     {
       "evento": 3,
-      "atividade_emitida": 1.572984,
+      "atividade_emitida": 566.27424,
       "velocidade_vento": 1.4,
       "angulo_vento": 140.0,
       "classe_estabilidade": "D"
     },
     {
       "evento": 4,
-      "atividade_emitida": 1.525067,
+      "atividade_emitida": 549.02412,
       "velocidade_vento": 1.41,
       "angulo_vento": 140.2,
       "classe_estabilidade": "D"
     },
     {
       "evento": 5,
-      "atividade_emitida": 1.477932,
+      "atividade_emitida": 532.05552,
       "velocidade_vento": 1.41,
       "angulo_vento": 140.1,
       "classe_estabilidade": "D"
     },
     {
       "evento": 6,
-      "atividade_emitida": 1.439375,
+      "atividade_emitida": 518.1750000000001,
       "velocidade_vento": 1.42,
       "angulo_vento": 139.7,
       "classe_estabilidade": "C"
     },
     {
       "evento": 7,
-      "atividade_emitida": 1.408132,
+      "atividade_emitida": 506.92751999999996,
       "velocidade_vento": 1.45,
       "angulo_vento": 139.3,
       "classe_estabilidade": "C"
     },
     {
       "evento": 8,
-      "atividade_emitida": 1.376335,
+      "atividade_emitida": 495.48060000000004,
       "velocidade_vento": 1.5,
       "angulo_vento": 138.9,
       "classe_estabilidade": "C"
     },
     {
       "evento": 9,
-      "atividade_emitida": 1.336985,
+      "atividade_emitida": 481.31460000000004,
       "velocidade_vento": 1.57,
       "angulo_vento": 138.7,
       "classe_estabilidade": "C"
     },
     {
       "evento": 10,
-      "atividade_emitida": 1.290469,
+      "atividade_emitida": 464.56884,
       "velocidade_vento": 1.64,
       "angulo_vento": 138.8,
       "classe_estabilidade": "C"
     },
     {
       "evento": 11,
-      "atividade_emitida": 1.245111,
+      "atividade_emitida": 448.23996000000005,
       "velocidade_vento": 1.69,
       "angulo_vento": 139.1,
       "classe_estabilidade": "C"
     },
     {
       "evento": 12,
-      "atividade_emitida": 1.211433,
+      "atividade_emitida": 436.11588,
       "velocidade_vento": 1.72,
       "angulo_vento": 139.7,
       "classe_estabilidade": "C"
     },
     {
       "evento": 13,
-      "atividade_emitida": 1.194508,
+      "atividade_emitida": 430.02288,
       "velocidade_vento": 1.73,
       "angulo_vento": 140.4,
       "classe_estabilidade": "C"
     },
     {
       "evento": 14,
-      "atividade_emitida": 1.190106,
+      "atividade_emitida": 428.43816000000004,
       "velocidade_vento": 1.74,
       "angulo_vento": 141.2,
       "classe_estabilidade": "C"
     },
     {
       "evento": 15,
-      "atividade_emitida": 1.187404,
+      "atividade_emitida": 427.46543999999994,
       "velocidade_vento": 1.75,
       "angulo_vento": 141.8,
       "classe_estabilidade": "C"
     },
     {
       "evento": 16,
-      "atividade_emitida": 1.176134,
+      "atividade_emitida": 423.40824,
       "velocidade_vento": 1.79,
       "angulo_vento": 142.2,
       "classe_estabilidade": "C"
     },
     {
       "evento": 17,
-      "atividade_emitida": 1.152895,
+      "atividade_emitida": 415.0422,
       "velocidade_vento": 1.86,
       "angulo_vento": 142.3,
       "classe_estabilidade": "C"
     },
     {
       "evento": 18,
-      "atividade_emitida": 1.122253,
+      "atividade_emitida": 404.01108,
       "velocidade_vento": 1.94,
       "angulo_vento": 142.2,
       "classe_estabilidade": "C"
     },
     {
       "evento": 19,
-      "atividade_emitida": 1.092191,
+      "atividade_emitida": 393.18875999999995,
       "velocidade_vento": 2.02,
       "angulo_vento": 141.9,
       "classe_estabilidade": "C"
     },
     {
       "evento": 20,
-      "atividade_emitida": 1.067661,
+      "atividade_emitida": 384.35796,
       "velocidade_vento": 2.09,
       "angulo_vento": 141.5,
       "classe_estabilidade": "C"
     },
     {
       "evento": 21,
-      "atividade_emitida": 1.047109,
+      "atividade_emitida": 376.95924,
       "velocidade_vento": 2.12,
       "angulo_vento": 141.2,
       "classe_estabilidade": "C"
     },
     {
       "evento": 22,
-      "atividade_emitida": 1.024382,
+      "atividade_emitida": 368.77752,
       "velocidade_vento": 2.13,
       "angulo_vento": 141.2,
       "classe_estabilidade": "C"
     },
     {
       "evento": 23,
-      "atividade_emitida": 0.99428,
+      "atividade_emitida": 357.9408,
       "velocidade_vento": 2.13,
       "angulo_vento": 141.4,
       "classe_estabilidade": "C"
     },
     {
       "evento": 24,
-      "atividade_emitida": 0.957355,
+      "atividade_emitida": 344.64779999999996,
       "velocidade_vento": 2.13,
       "angulo_vento": 141.9,
       "classe_estabilidade": "C"
     },
     {
       "evento": 25,
-      "atividade_emitida": 0.920256,
+      "atividade_emitida": 331.29215999999997,
       "velocidade_vento": 2.16,
       "angulo_vento": 142.7,
       "classe_estabilidade": "C"
     },
     {
       "evento": 26,
-      "atividade_emitida": 0.891405,
+      "atividade_emitida": 320.9058,
       "velocidade_vento": 2.2,
       "angulo_vento": 143.6,
       "classe_estabilidade": "C"
     },
     {
       "evento": 27,
-      "atividade_emitida": 0.875237,
+      "atividade_emitida": 315.08532,
       "velocidade_vento": 2.27,
       "angulo_vento": 144.6,
       "classe_estabilidade": "C"
     },
     {
       "evento": 28,
-      "atividade_emitida": 0.86925,
+      "atividade_emitida": 312.93,
       "velocidade_vento": 2.34,
       "angulo_vento": 145.4,
       "classe_estabilidade": "C"
     },
     {
       "evento": 29,
-      "atividade_emitida": 0.865897,
+      "atividade_emitida": 311.72292,
       "velocidade_vento": 2.39,
       "angulo_vento": 146.0,
       "classe_estabilidade": "C"
     },
     {
       "evento": 30,
-      "atividade_emitida": 0.857785,
+      "atividade_emitida": 308.8026,
       "velocidade_vento": 2.42,
       "angulo_vento": 146.3,
       "classe_estabilidade": "C"
     },
     {
       "evento": 31,
-      "atividade_emitida": 0.842311,
+      "atividade_emitida": 303.23196,
       "velocidade_vento": 2.38,
       "angulo_vento": 146.3,
       "classe_estabilidade": "C"
     },
     {
       "evento": 32,
-      "atividade_emitida": 0.822496,
+      "atividade_emitida": 296.09856,
       "velocidade_vento": 2.33,
       "angulo_vento": 146.1,
       "classe_estabilidade": "C"
     },
     {
       "evento": 33,
-      "atividade_emitida": 0.803706,
+      "atividade_emitida": 289.33416,
       "velocidade_vento": 2.29,
       "angulo_vento": 145.9,
       "classe_estabilidade": "C"
     },
     {
       "evento": 34,
-      "atividade_emitida": 0.788995,
+      "atividade_emitida": 284.0382,
       "velocidade_vento": 2.28,
       "angulo_vento": 145.7,
       "classe_estabilidade": "C"
     },
     {
       "evento": 35,
-      "atividade_emitida": 0.776648,
+      "atividade_emitida": 279.59328,
       "velocidade_vento": 2.29,
       "angulo_vento": 145.7,
       "classe_estabilidade": "C"
     },
     {
       "evento": 36,
-      "atividade_emitida": 0.761681,
+      "atividade_emitida": 274.20516000000003,
       "velocidade_vento": 2.32,
       "angulo_vento": 145.9,
       "classe_estabilidade": "D"
     },
     {
       "evento": 37,
-      "atividade_emitida": 0.740008,
+      "atividade_emitida": 266.40288,
       "velocidade_vento": 2.34,
       "angulo_vento": 146.4,
       "classe_estabilidade": "D"
     },
     {
       "evento": 38,
-      "atividade_emitida": 0.712004,
+      "atividade_emitida": 256.32144,
       "velocidade_vento": 2.35,
       "angulo_vento": 147.1,
       "classe_estabilidade": "D"
     },
     {
       "evento": 39,
-      "atividade_emitida": 0.682758,
+      "atividade_emitida": 245.79288,
       "velocidade_vento": 2.32,
       "angulo_vento": 147.9,
       "classe_estabilidade": "D"
     },
     {
       "evento": 40,
-      "atividade_emitida": 0.658848,
+      "atividade_emitida": 237.18528,
       "velocidade_vento": 2.27,
       "angulo_vento": 148.7,
       "classe_estabilidade": "D"
     },
     {
       "evento": 41,
-      "atividade_emitida": 0.644024,
+      "atividade_emitida": 231.84864000000002,
       "velocidade_vento": 2.21,
       "angulo_vento": 149.3,
       "classe_estabilidade": "D"
     },
     {
       "evento": 42,
-      "atividade_emitida": 0.636947,
+      "atividade_emitida": 229.30092000000002,
       "velocidade_vento": 2.16,
       "angulo_vento": 149.7,
       "classe_estabilidade": "D"
     },
     {
       "evento": 43,
-      "atividade_emitida": 0.6325,
+      "atividade_emitida": 227.7,
       "velocidade_vento": 2.12,
       "angulo_vento": 149.8,
       "classe_estabilidade": "D"
     },
     {
       "evento": 44,
-      "atividade_emitida": 0.625542,
+      "atividade_emitida": 225.19512,
       "velocidade_vento": 2.12,
       "angulo_vento": 149.7,
       "classe_estabilidade": "D"
     },
     {
       "evento": 45,
-      "atividade_emitida": 0.61428,
+      "atividade_emitida": 221.1408,
       "velocidade_vento": 2.13,
       "angulo_vento": 149.3,
       "classe_estabilidade": "D"
     },
     {
       "evento": 46,
-      "atividade_emitida": 0.600868,
+      "atividade_emitida": 216.31248,
       "velocidade_vento": 2.14,
       "angulo_vento": 148.9,
       "classe_estabilidade": "D"
     },
     {
       "evento": 47,
-      "atividade_emitida": 0.589015,
+      "atividade_emitida": 212.04539999999997,
       "velocidade_vento": 2.15,
       "angulo_vento": 148.6,
       "classe_estabilidade": "D"
     },
     {
       "evento": 48,
-      "atividade_emitida": 0.580597,
+      "atividade_emitida": 209.01492000000002,
       "velocidade_vento": 2.13,
       "angulo_vento": 148.5,
       "classe_estabilidade": "D"
     },
     {
       "evento": 49,
-      "atividade_emitida": 0.573921,
+      "atividade_emitida": 206.61156,
       "velocidade_vento": 2.06,
       "angulo_vento": 148.6,
       "classe_estabilidade": "D"
     },
     {
       "evento": 50,
-      "atividade_emitida": 0.564908,
+      "atividade_emitida": 203.36687999999998,
       "velocidade_vento": 1.99,
       "angulo_vento": 149.0,
       "classe_estabilidade": "D"
     },
     {
       "evento": 51,
-      "atividade_emitida": 0.550222,
+      "atividade_emitida": 198.07992,
       "velocidade_vento": 1.93,
       "angulo_vento": 149.7,
       "classe_estabilidade": "D"
     },
     {
       "evento": 52,
-      "atividade_emitida": 0.529954,
+      "atividade_emitida": 190.78344,
       "velocidade_vento": 1.89,
       "angulo_vento": 150.6,
       "classe_estabilidade": "D"
     },
     {
       "evento": 53,
-      "atividade_emitida": 0.507832,
+      "atividade_emitida": 182.81951999999998,
       "velocidade_vento": 1.87,
       "angulo_vento": 151.4,
       "classe_estabilidade": "D"
     },
     {
       "evento": 54,
-      "atividade_emitida": 0.488837,
+      "atividade_emitida": 175.98132,
       "velocidade_vento": 1.87,
       "angulo_vento": 152.2,
       "classe_estabilidade": "D"
     },
     {
       "evento": 55,
-      "atividade_emitida": 0.476002,
+      "atividade_emitida": 171.36072,
       "velocidade_vento": 1.87,
       "angulo_vento": 152.7,
       "classe_estabilidade": "D"
     },
     {
       "evento": 56,
-      "atividade_emitida": 0.468689,
+      "atividade_emitida": 168.72804000000002,
       "velocidade_vento": 1.84,
       "angulo_vento": 153.0,
       "classe_estabilidade": "D"
     },
     {
       "evento": 57,
-      "atividade_emitida": 0.463491,
+      "atividade_emitida": 166.85676,
       "velocidade_vento": 1.79,
       "angulo_vento": 153.0,
       "classe_estabilidade": "D"
     },
     {
       "evento": 58,
-      "atividade_emitida": 0.45694,
+      "atividade_emitida": 164.4984,
       "velocidade_vento": 1.72,
       "angulo_vento": 152.8,
       "classe_estabilidade": "D"
     },
     {
       "evento": 59,
-      "atividade_emitida": 0.447935,
+      "atividade_emitida": 161.25660000000002,
       "velocidade_vento": 1.63,
       "angulo_vento": 152.5,
       "classe_estabilidade": "D"
     },
     {
       "evento": 60,
-      "atividade_emitida": 0.438155,
+      "atividade_emitida": 157.7358,
       "velocidade_vento": 1.55,
       "angulo_vento": 152.4,
       "classe_estabilidade": "D"
     },
     {
       "evento": 61,
-      "atividade_emitida": 0.430277,
+      "atividade_emitida": 154.89972,
       "velocidade_vento": 1.49,
       "angulo_vento": 152.4,
       "classe_estabilidade": "D"
     },
     {
       "evento": 62,
-      "atividade_emitida": 0.425509,
+      "atividade_emitida": 153.18324,
       "velocidade_vento": 1.45,
       "angulo_vento": 152.6,
       "classe_estabilidade": "D"
     },
     {
       "evento": 63,
-      "atividade_emitida": 0.422334,
+      "atividade_emitida": 152.04023999999998,
       "velocidade_vento": 1.44,
       "angulo_vento": 153.2,
       "classe_estabilidade": "D"
     },
     {
       "evento": 64,
-      "atividade_emitida": 0.41744,
+      "atividade_emitida": 150.2784,
       "velocidade_vento": 1.43,
       "angulo_vento": 153.9,
       "classe_estabilidade": "D"
     },
     {
       "evento": 65,
-      "atividade_emitida": 0.408072,
+      "atividade_emitida": 146.90592,
       "velocidade_vento": 1.4,
       "angulo_vento": 154.8,
       "classe_estabilidade": "D"
     },
     {
       "evento": 66,
-      "atividade_emitida": 0.394064,
+      "atividade_emitida": 141.86304,
       "velocidade_vento": 1.36,
       "angulo_vento": 155.7,
       "classe_estabilidade": "E"
     },
     {
       "evento": 67,
-      "atividade_emitida": 0.378027,
+      "atividade_emitida": 136.08972,
       "velocidade_vento": 1.29,
       "angulo_vento": 156.4,
       "classe_estabilidade": "E"
     },
     {
       "evento": 68,
-      "atividade_emitida": 0.363618,
+      "atividade_emitida": 130.90248,
       "velocidade_vento": 1.22,
       "angulo_vento": 156.8,
       "classe_estabilidade": "E"
     },
     {
       "evento": 69,
-      "atividade_emitida": 0.353167,
+      "atividade_emitida": 127.14012,
       "velocidade_vento": 1.15,
       "angulo_vento": 156.9,
       "classe_estabilidade": "E"
     },
     {
       "evento": 70,
-      "atividade_emitida": 0.3464,
+      "atividade_emitida": 124.704,
       "velocidade_vento": 1.11,
       "angulo_vento": 156.8,
       "classe_estabilidade": "E"
     },
     {
       "evento": 71,
-      "atividade_emitida": 0.341054,
+      "atividade_emitida": 122.77944000000001,
       "velocidade_vento": 1.09,
       "angulo_vento": 156.4,
       "classe_estabilidade": "E"

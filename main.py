@@ -9,7 +9,6 @@ from config import Config
 from model import GaussianPuffModel
 from scenario_generator import LLMScenarioGenerator
 
-
 def main():
 
     inicio_clock = datetime.now()
