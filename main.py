@@ -27,6 +27,7 @@ def main():
         / cenario_id
         / config.diretorio_plotagens_parciais
     )
+    
 
     if config.gerar_video_temporal and not config.gerar_plotagens_temporais:
         plotting.gerar_video_temporal(diretorio_plotagens)
