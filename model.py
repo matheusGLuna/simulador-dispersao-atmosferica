@@ -1,6 +1,21 @@
+from dataclasses import dataclass
+
 import numpy as np
 from config import Config
 from puff import Puff
+
+
+@dataclass(frozen=True)
+class ResultadoSuperacaoDose:
+    limiar_sv: float
+    area_m2: float
+    alcance_maximo_m: float | None
+    pontos_mais_distantes_m: tuple[tuple[float, float], ...]
+
+    @property
+    def atingido(self) -> bool:
+        return self.alcance_maximo_m is not None
+
 
 class GaussianPuffModel:
     def __init__(self, config: Config):
@@ -82,13 +97,72 @@ class GaussianPuffModel:
         """Calcula a dose efetiva por imersão na pluma [Sv]."""
         return self.config.coeficiente_dose_imersao * concentracoes_int_t_xy
 
-    def calcular_dose_inalacao(self, concentracoes_int_t_xy):
-        """Calcula a dose efetiva por inalação [Sv]."""
-        fator_inalacao = (
-            self.config.taxa_respiracao
-            * self.config.coeficiente_dose_inalacao
+    def analisar_superacao_dose(self, campo_dose_xy, eixo_x, eixo_y) -> ResultadoSuperacaoDose:
+        """Estima área e alcance de D >= limiar nos pontos da malha XY.
+
+        A área usa a região de influência de cada ponto dentro do domínio:
+        em malhas uniformes, bordas têm peso 1/2 e cantos têm peso 1/4.
+        O alcance e os empates se referem aos pontos amostrados, sem interpolação.
+        """
+        campo = np.asarray(campo_dose_xy, dtype=float)
+        eixo_x = np.asarray(eixo_x, dtype=float)
+        eixo_y = np.asarray(eixo_y, dtype=float)
+        larguras = []
+        for eixo in (eixo_x, eixo_y):
+            if (
+                eixo.ndim != 1
+                or eixo.size < 2
+                or not np.all(np.isfinite(eixo))
+                or not np.all(np.diff(eixo) > 0)
+            ):
+                raise ValueError("Os eixos devem conter ao menos dois pontos finitos e crescentes")
+            intervalos = np.diff(eixo)
+            larguras_eixo = np.empty(eixo.size, dtype=float)
+            larguras_eixo[0] = intervalos[0] / 2
+            larguras_eixo[-1] = intervalos[-1] / 2
+            larguras_eixo[1:-1] = (intervalos[:-1] + intervalos[1:]) / 2
+            larguras.append(larguras_eixo)
+
+        if campo.shape != (eixo_x.size, eixo_y.size):
+            raise ValueError("O campo de dose deve ter formato (len(eixo_x), len(eixo_y))")
+        if not np.all(np.isfinite(campo)) or np.any(campo < 0):
+            raise ValueError("O campo de dose deve conter valores finitos e não negativos")
+
+        limiar = np.asarray(self.config.limiar_dose_imersao, dtype=float)
+        if (
+            limiar.shape != ()
+            or not np.isfinite(limiar)
+            or limiar <= 0
+        ):
+            raise ValueError("limiar_dose_imersao deve ser um valor positivo e finito")
+        limiar = float(limiar)
+
+        mascara = campo >= limiar
+        if not np.any(mascara):
+            return ResultadoSuperacaoDose(limiar, 0.0, None, ())
+
+        areas_pontos = larguras[0][:, None] * larguras[1][None, :]
+        distancias_quadradas = eixo_x[:, None] ** 2 + eixo_y[None, :] ** 2
+        indices_x, indices_y = np.nonzero(mascara)
+        distancias_selecionadas = distancias_quadradas[mascara]
+        maior_distancia_quadrada = float(np.max(distancias_selecionadas))
+        # Tolerância apenas para arredondamentos numéricos em distâncias iguais.
+        empates = np.isclose(
+            distancias_selecionadas,
+            maior_distancia_quadrada,
+            rtol=1e-12,
+            atol=0,
         )
-        return fator_inalacao * concentracoes_int_t_xy
+        pontos = tuple(zip(
+            eixo_x[indices_x[empates]].tolist(),
+            eixo_y[indices_y[empates]].tolist(),
+        ))
+        return ResultadoSuperacaoDose(
+            limiar_sv=limiar,
+            area_m2=float(np.sum(areas_pontos[mascara])),
+            alcance_maximo_m=float(np.sqrt(maior_distancia_quadrada)),
+            pontos_mais_distantes_m=pontos,
+        )
 
     @staticmethod
     def validar_parametros_malha(limite_positivo, limite_negativo, passo, eixo):

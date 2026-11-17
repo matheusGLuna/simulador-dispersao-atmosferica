@@ -94,11 +94,21 @@ def main():
             )
 
     dose_imersao_xy = model.calcular_dose_imersao(concentracoes_int_t_xy)
-    dose_inalacao_xy = model.calcular_dose_inalacao(concentracoes_int_t_xy)
-    vmax_chi_t = float(np.max(concentracoes_int_t_xy))
-    fator_dose_inalacao = (
-        config.taxa_respiracao * config.coeficiente_dose_inalacao
+    max_dose_imersao = float(np.max(dose_imersao_xy))
+    resultado_superacao = model.analisar_superacao_dose(
+        dose_imersao_xy, eixo_x, eixo_y,
     )
+    print(f"Dose efetiva máxima por imersão: {max_dose_imersao:.3e} Sv")
+    print("Análise espacial da dose por imersão (D >= limiar):")
+    print(f"Limiar: {resultado_superacao.limiar_sv:.3e} Sv")
+    if resultado_superacao.atingido:
+        print(f"  Área estimada de superação: {resultado_superacao.area_m2 / 1e6:.6g} km²")
+        print(f"  Alcance radial máximo: {resultado_superacao.alcance_maximo_m / 1000:.6g} km")
+        print("  Pontos mais distantes (x, y), em metros:")
+        for x, y in resultado_superacao.pontos_mais_distantes_m:
+            print(f"    ({x:.6g}, {y:.6g})")
+    else:
+        print("  Limiar não atingido; área estimada de superação: 0 km²")
 
     plotting.plotar_heatmap_dosimetria(
         dose_imersao_xy,
@@ -107,18 +117,9 @@ def main():
         titulo="Dose efetiva por imersão na pluma",
         nome_arquivo="dose_imersao_heatmap_xy.png",
         vmin_cores=config.vmin_logaritmico_dose,
-        vmax_cores=config.coeficiente_dose_imersao * vmax_chi_t,
+        vmax_cores=max_dose_imersao,
         cenario_id=cenario_id,
-    )
-    plotting.plotar_heatmap_dosimetria(
-        dose_inalacao_xy,
-        eixo_x,
-        eixo_y,
-        titulo="Dose efetiva por inalação",
-        nome_arquivo="dose_inalacao_heatmap_xy.png",
-        vmin_cores=config.vmin_logaritmico_dose,
-        vmax_cores=fator_dose_inalacao * vmax_chi_t,
-        cenario_id=cenario_id,
+        resultado_superacao=resultado_superacao,
     )
 
     if config.gerar_plotagens_temporais:
@@ -158,6 +159,7 @@ def main():
                 evento + 1,
                 vmax_cores=vmax_animacao,
                 cenario_id=cenario_id,
+                max_concentracao_global=vmax_global_animacao,
             )
 
         del campos_temporais
