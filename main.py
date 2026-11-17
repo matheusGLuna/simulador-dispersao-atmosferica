@@ -1,7 +1,5 @@
-from pathlib import Path
 from datetime import datetime
-import shutil
-import subprocess
+from pathlib import Path
 import time
 
 import numpy as np
@@ -11,7 +9,7 @@ from config import Config
 from model import GaussianPuffModel
 from scenario_generator import LLMScenarioGenerator
 
-if __name__ == "__main__":
+def main():
 
     inicio_clock = datetime.now()
     inicio = time.perf_counter()
@@ -21,154 +19,161 @@ if __name__ == "__main__":
     model = GaussianPuffModel(config)
     scenario_generator = LLMScenarioGenerator(config)
 
-    concentracoes_xy = None
-    vmax_referencia = None
-
     lista_puffs = scenario_generator.gerar_lista_puffs(config.arquivo_cenario)
     cenario_id = scenario_generator.cenario_id
     total_eventos = len(lista_puffs)
+    diretorio_plotagens = (
+        Path(config.diretorio_dados_parciais)
+        / cenario_id
+        / config.diretorio_plotagens_parciais
+    )
+    
 
-    if config.simular_campo__acumulado:
-        
-        for puff in lista_puffs:
+    if config.gerar_video_temporal and not config.gerar_plotagens_temporais:
+        plotting.gerar_video_temporal(diretorio_plotagens)
+        return
 
-            id_puff = puff.evento + 1
-            
-            (
-                concentracoes_puff_xy,
-                eixo_x,
-                eixo_y
-            ) = model.gerar_meshgrid_xy(
-                puff
-            )
-
-            if concentracoes_xy is None:
-                concentracoes_xy = np.zeros_like(concentracoes_puff_xy)
-
-            np.add(
-                concentracoes_xy,
-                concentracoes_puff_xy,
-                out=concentracoes_xy
-            )
-
-        if concentracoes_xy is not None:
-            vmax_referencia = float(np.max(concentracoes_xy))
-            print("Campo resultante acumulado com sucesso")
-            print(f"Vmax de referência para os heatmaps: {vmax_referencia:.3e} {config.unidade}/m³")
-            plotting.plotar_heatmap_xy(
-                concentracoes_xy,
-                eixo_x,
-                eixo_y,
-                campo_acumulado=True,
-                vmax_referencia=vmax_referencia,
-                cenario_id=cenario_id,
-            )
-
-        fim_clock_1 = datetime.now()
-        fim_1 = time.perf_counter()
-        print(f"Fim 1 : {fim_clock_1.strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"Tempo de processamento 1 : {fim_1 - inicio:.2f} segundos")   
-
-    if config.simular_animacao_temporal and vmax_referencia is None:
-        print(
-            "A animação temporal requer a execução da simulação do campo acumulado para definir "
-            "o vmax de referência. Habilite simular_campo_acumulado."
+    if len(lista_puffs) == 1:
+        raise ValueError(
+            "A simulação temporal requer um cenário com pelo menos dois eventos"
         )
 
-    if config.simular_animacao_temporal and vmax_referencia is not None:
-        
-        if len(lista_puffs) == 1:
-            raise ValueError("A animação temporal requer um cenario com pelo menos dois eventos puff")
-        else:
-            intervalo_tempo_eventos = lista_puffs[0].idade - lista_puffs[1].idade
+    intervalo_tempo_eventos = scenario_generator.delta_t_s
+    distancias_cantos_malha = [
+        np.hypot(x, y)
+        for x in (-config.dim_eixo_x_neg, config.dim_eixo_x_pos)
+        for y in (-config.dim_eixo_y_neg, config.dim_eixo_y_pos)
+    ]
+    distancia_maxima_malha = max(distancias_cantos_malha)
+    X, Y, eixo_x, eixo_y = model.gerar_malha_xy()
 
-        for evento in range(total_eventos):
+    if config.gerar_plotagens_temporais:
+        diretorio_campos = (
+            Path(config.diretorio_dados_parciais)
+            / cenario_id
+            / "campos_temporais"
+        )
+        diretorio_campos.mkdir(parents=True, exist_ok=True)
+        arquivo_campos = diretorio_campos / "concentracoes_temporais.npy"
+        arquivo_eixo_x = diretorio_campos / "eixo_x.npy"
+        arquivo_eixo_y = diretorio_campos / "eixo_y.npy"
 
-            concentracoes_xy = None
+        np.save(arquivo_eixo_x, eixo_x)
+        np.save(arquivo_eixo_y, eixo_y)
+        campos_temporais = np.lib.format.open_memmap(
+            arquivo_campos,
+            mode="w+",
+            dtype=np.float64,
+            shape=(total_eventos, *X.shape),
+        )
+        vmax_global_animacao = 0.0
 
-            for puff in lista_puffs:
-                
-                if puff.evento > evento:
-                    continue
-                
-                idade_instantanea =  (evento - puff.evento + 1) * intervalo_tempo_eventos
-                puff.idade = idade_instantanea
-                sigma_y = model.calcular_sigma_y(puff)
+    concentracoes_int_t_xy = np.zeros_like(X, dtype=float)
 
-                distancias_cantos_malha = [
-                    np.hypot(x, y)
-                    for x in (-config.dim_eixo_x_neg, config.dim_eixo_x_pos)
-                    for y in (-config.dim_eixo_y_neg, config.dim_eixo_y_pos)
-                ]
-                maxima_distancia_interesse = max(distancias_cantos_malha) + 5*sigma_y
-                distancia_centro_instantanea = puff.idade*puff.velocidade_vento
+    print(f"Calculando malhas de concentração instantâneas ...")
+    for evento in range(total_eventos):
+        concentracoes_xy = model.calcular_campo_instantaneo(
+            evento,
+            lista_puffs,
+            intervalo_tempo_eventos,
+            distancia_maxima_malha,
+            X,
+            Y,
+        )
+        np.add(
+            concentracoes_int_t_xy,
+            concentracoes_xy * intervalo_tempo_eventos,
+            out=concentracoes_int_t_xy,
+        )
 
-                if maxima_distancia_interesse < distancia_centro_instantanea:
-                    continue
+        if config.gerar_plotagens_temporais:
+            campos_temporais[evento] = concentracoes_xy
+            vmax_global_animacao = max(
+                vmax_global_animacao,
+                float(np.max(concentracoes_xy)),
+            )
 
-                (
-                    concentracoes_puff_xy,
-                    eixo_x,
-                    eixo_y
-                ) = model.gerar_meshgrid_xy(
-                    puff
-                )
+    dose_imersao_xy = model.calcular_dose_imersao(concentracoes_int_t_xy)
+    max_dose_imersao = float(np.max(dose_imersao_xy))
+    resultado_superacao = model.analisar_superacao_dose(
+        dose_imersao_xy, eixo_x, eixo_y,
+    )
+    print(f"Dose efetiva máxima por imersão: {max_dose_imersao:.3e} Sv")
+    print("Análise espacial da dose por imersão (D >= limiar):")
+    print(f"Limiar: {resultado_superacao.limiar_sv:.3e} Sv")
+    if resultado_superacao.atingido:
+        print(f"  Área estimada de superação: {resultado_superacao.area_m2 / 1e6:.6g} km²")
+        print(f"  Alcance radial máximo: {resultado_superacao.alcance_maximo_m / 1000:.6g} km")
+        print("  Pontos mais distantes (x, y), em metros:")
+        for x, y in resultado_superacao.pontos_mais_distantes_m:
+            print(f"    ({x:.6g}, {y:.6g})")
+    else:
+        print("  Limiar não atingido; área estimada de superação: 0 km²")
 
-                if concentracoes_xy is None:
-                    concentracoes_xy = np.zeros_like(concentracoes_puff_xy)
+    plotting.plotar_heatmap_dosimetria(
+        dose_imersao_xy,
+        eixo_x,
+        eixo_y,
+        titulo="Dose efetiva por imersão na pluma",
+        nome_arquivo="dose_imersao_heatmap_xy.png",
+        vmin_cores=config.vmin_logaritmico_dose,
+        vmax_cores=max_dose_imersao,
+        cenario_id=cenario_id,
+        resultado_superacao=resultado_superacao,
+    )
 
-                np.add(
-                    concentracoes_xy,
-                    concentracoes_puff_xy,
-                    out=concentracoes_xy
-                )
+    if config.gerar_plotagens_temporais:
+        campos_temporais.flush()
+        del campos_temporais
+        vmax_animacao = (
+            config.vmax_animacao_efetivo
+            if config.vmax_animacao_efetivo is not None
+            else vmax_global_animacao
+        )
+        print(
+            f"Vmax para animação logarítmica: {vmax_animacao:.3e} "
+            f"{config.unidade}/m³"
+        )
 
-            plotting.plotar_heatmap_xy(
+    fim_clock_1 = datetime.now()
+    fim_1 = time.perf_counter()
+    print(f"Fim 1 : {fim_clock_1.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Tempo de processamento 1 : {fim_1 - inicio:.2f} segundos")
+
+    if config.gerar_plotagens_temporais:
+        diretorio_plotagens.mkdir(parents=True, exist_ok=True)
+
+        for arquivo_png in diretorio_plotagens.glob("evento_*_heatmap_xy.png"):
+            arquivo_png.unlink()
+
+        campos_temporais = np.load(arquivo_campos, mmap_mode="r")
+        eixo_x = np.load(arquivo_eixo_x, mmap_mode="r")
+        eixo_y = np.load(arquivo_eixo_y, mmap_mode="r")
+
+        print("Plotando mapas de calor bidimensionais ...")
+        for evento, concentracoes_xy in enumerate(campos_temporais):
+            plotting.plotar_heatmap_temporal(
                 concentracoes_xy,
                 eixo_x,
                 eixo_y,
                 evento + 1,
-                campo_acumulado=False,
-                vmax_referencia=vmax_referencia,
+                vmax_cores=vmax_animacao,
                 cenario_id=cenario_id,
+                max_concentracao_global=vmax_global_animacao,
             )
 
-            print (f"evento {evento} processado")
+        del campos_temporais
+        del eixo_x
+        del eixo_y
+
+        if config.gerar_video_temporal:
+            plotting.gerar_video_temporal(diretorio_plotagens)
 
         fim_clock_2 = datetime.now()
         fim_2 = time.perf_counter()
         print(f"Fim 2 : {fim_clock_2.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"Tempo de processamento 2 : {fim_2 - inicio:.2f} segundos")
 
-        diretorio_plotagens = (
-            Path(config.diretorio_dados_parciais)
-            / cenario_id
-            / config.diretorio_plotagens_parciais
-        )
-        arquivo_video = diretorio_plotagens / "evolucao_temporal.mp4"
-        ffmpeg = shutil.which("ffmpeg")
 
-        if ffmpeg is None:
-            print("FFmpeg não encontrado; o vídeo temporal não foi gerado.")
-        else:
-            comando_ffmpeg = [
-                ffmpeg,
-                "-y",
-                "-framerate",
-                "10",
-                "-start_number",
-                "1",
-                "-i",
-                str(diretorio_plotagens / "evento_%02d_heatmap_xy.png"),
-                "-c:v",
-                "libx264",
-                "-pix_fmt",
-                "yuv420p",
-                str(arquivo_video),
-            ]
-
-            try:
-                subprocess.run(comando_ffmpeg, check=True)
-                print(f"Vídeo temporal salvo em: {arquivo_video}")
-            except subprocess.CalledProcessError as error:
-                print(f"Falha ao gerar o vídeo temporal: {error}")
+if __name__ == "__main__":
+    main()

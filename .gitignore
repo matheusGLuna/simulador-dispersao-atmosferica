@@ -203,6 +203,9 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# Cache temporário dos campos de concentração por cenário
+dados_parciais/
+
 # Ruff stuff:
 .ruff_cache/
 
@@ -216,6 +219,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-
-# Partial atmospheric dispersion data
-dados_parciais/

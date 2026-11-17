@@ -1,13 +1,28 @@
+from dataclasses import dataclass
+
 import numpy as np
 from config import Config
 from puff import Puff
+
+
+@dataclass(frozen=True)
+class ResultadoSuperacaoDose:
+    limiar_sv: float
+    area_m2: float
+    alcance_maximo_m: float | None
+    pontos_mais_distantes_m: tuple[tuple[float, float], ...]
+
+    @property
+    def atingido(self) -> bool:
+        return self.alcance_maximo_m is not None
+
 
 class GaussianPuffModel:
     def __init__(self, config: Config):
         self.config = config
 
-    def gerar_meshgrid_xy(self, puff: Puff):
-
+    def gerar_malha_xy(self):
+        """Gera e valida uma única malha XY para todo o cenário."""
         x_pos = self.config.dim_eixo_x_pos
         x_neg = self.config.dim_eixo_x_neg
         x_step = self.config.passo_x
@@ -35,7 +50,119 @@ class GaussianPuffModel:
 
         X, Y = np.meshgrid(x_vals, y_vals, indexing='ij')
 
+        return X, Y, x_vals, y_vals
+
+    def gerar_meshgrid_xy(self, puff: Puff):
+        """Mantém compatibilidade ao retornar concentração e eixos de um puff."""
+        X, Y, x_vals, y_vals = self.gerar_malha_xy()
         return self.calcular_concentracao(X, Y, puff), x_vals, y_vals
+
+    def calcular_campo_instantaneo(
+        self,
+        evento,
+        lista_puffs,
+        intervalo_tempo_eventos,
+        distancia_maxima_malha,
+        X,
+        Y,
+    ):
+        """Calcula C(x, y, t) somando os puffs ativos em um evento temporal."""
+        concentracoes_xy = np.zeros_like(X, dtype=float)
+
+        for puff in lista_puffs:
+            if puff.evento > evento or puff.atividade_emitida == 0:
+                continue
+
+            idade_no_instante = (
+                evento - puff.evento + 1
+            ) * intervalo_tempo_eventos
+            puff.idade = idade_no_instante
+            sigma_y = self.calcular_sigma_y(puff, idade_no_instante)
+            distancia_centro = idade_no_instante * puff.velocidade_vento
+
+            if distancia_maxima_malha + 5 * sigma_y < distancia_centro:
+                continue
+
+            concentracao_puff = self.calcular_concentracao(
+                X,
+                Y,
+                puff,
+                idade=idade_no_instante,
+            )
+            np.add(concentracoes_xy, concentracao_puff, out=concentracoes_xy)
+
+        return concentracoes_xy
+
+    def calcular_dose_imersao(self, concentracoes_int_t_xy):
+        """Calcula a dose efetiva por imersão na pluma [Sv]."""
+        return self.config.coeficiente_dose_imersao * concentracoes_int_t_xy
+
+    def analisar_superacao_dose(self, campo_dose_xy, eixo_x, eixo_y) -> ResultadoSuperacaoDose:
+        """Estima área e alcance de D >= limiar nos pontos da malha XY.
+
+        A área usa a região de influência de cada ponto dentro do domínio:
+        em malhas uniformes, bordas têm peso 1/2 e cantos têm peso 1/4.
+        O alcance e os empates se referem aos pontos amostrados, sem interpolação.
+        """
+        campo = np.asarray(campo_dose_xy, dtype=float)
+        eixo_x = np.asarray(eixo_x, dtype=float)
+        eixo_y = np.asarray(eixo_y, dtype=float)
+        larguras = []
+        for eixo in (eixo_x, eixo_y):
+            if (
+                eixo.ndim != 1
+                or eixo.size < 2
+                or not np.all(np.isfinite(eixo))
+                or not np.all(np.diff(eixo) > 0)
+            ):
+                raise ValueError("Os eixos devem conter ao menos dois pontos finitos e crescentes")
+            intervalos = np.diff(eixo)
+            larguras_eixo = np.empty(eixo.size, dtype=float)
+            larguras_eixo[0] = intervalos[0] / 2
+            larguras_eixo[-1] = intervalos[-1] / 2
+            larguras_eixo[1:-1] = (intervalos[:-1] + intervalos[1:]) / 2
+            larguras.append(larguras_eixo)
+
+        if campo.shape != (eixo_x.size, eixo_y.size):
+            raise ValueError("O campo de dose deve ter formato (len(eixo_x), len(eixo_y))")
+        if not np.all(np.isfinite(campo)) or np.any(campo < 0):
+            raise ValueError("O campo de dose deve conter valores finitos e não negativos")
+
+        limiar = np.asarray(self.config.limiar_dose_imersao, dtype=float)
+        if (
+            limiar.shape != ()
+            or not np.isfinite(limiar)
+            or limiar <= 0
+        ):
+            raise ValueError("limiar_dose_imersao deve ser um valor positivo e finito")
+        limiar = float(limiar)
+
+        mascara = campo >= limiar
+        if not np.any(mascara):
+            return ResultadoSuperacaoDose(limiar, 0.0, None, ())
+
+        areas_pontos = larguras[0][:, None] * larguras[1][None, :]
+        distancias_quadradas = eixo_x[:, None] ** 2 + eixo_y[None, :] ** 2
+        indices_x, indices_y = np.nonzero(mascara)
+        distancias_selecionadas = distancias_quadradas[mascara]
+        maior_distancia_quadrada = float(np.max(distancias_selecionadas))
+        # Tolerância apenas para arredondamentos numéricos em distâncias iguais.
+        empates = np.isclose(
+            distancias_selecionadas,
+            maior_distancia_quadrada,
+            rtol=1e-12,
+            atol=0,
+        )
+        pontos = tuple(zip(
+            eixo_x[indices_x[empates]].tolist(),
+            eixo_y[indices_y[empates]].tolist(),
+        ))
+        return ResultadoSuperacaoDose(
+            limiar_sv=limiar,
+            area_m2=float(np.sum(areas_pontos[mascara])),
+            alcance_maximo_m=float(np.sqrt(maior_distancia_quadrada)),
+            pontos_mais_distantes_m=pontos,
+        )
 
     @staticmethod
     def validar_parametros_malha(limite_positivo, limite_negativo, passo, eixo):
@@ -58,16 +185,17 @@ class GaussianPuffModel:
                 f"({passo} m)"
             )
 
-    def calcular_concentracao(self, X, Y, puff: Puff):
+    def calcular_concentracao(self, X, Y, puff: Puff, idade=None):
+        idade_calculo = puff.idade if idade is None else idade
         
         angulo_graus = puff.angulo_vento % 360
         angulo_rad = np.deg2rad(angulo_graus)
 
-        centro_x = puff.idade*puff.velocidade_vento*np.cos(angulo_rad)
-        centro_y = puff.idade*puff.velocidade_vento*np.sin(angulo_rad)
+        centro_x = idade_calculo*puff.velocidade_vento*np.cos(angulo_rad)
+        centro_y = idade_calculo*puff.velocidade_vento*np.sin(angulo_rad)
 
-        sigma_y = self.calcular_sigma_y(puff)
-        sigma_z = self.calcular_sigma_z(puff)
+        sigma_y = self.calcular_sigma_y(puff, idade_calculo)
+        sigma_z = self.calcular_sigma_z(puff, idade_calculo)
         sigma_x = sigma_y
 
         fator = (
@@ -100,7 +228,7 @@ class GaussianPuffModel:
         
         return concentracao
 
-    def calcular_sigma_y(self, puff: Puff):
+    def calcular_sigma_y(self, puff: Puff, idade=None):
         classe = puff.classe_estabilidade.upper()
         terreno = self.config.terreno.upper()
         coeficientes = self.obter_coeficientes_sigma(terreno, classe)
@@ -108,10 +236,11 @@ class GaussianPuffModel:
         a = coeficientes['a']
         b = coeficientes['b']
 
-        distancia_centro_puff = puff.velocidade_vento*puff.idade
+        idade_calculo = puff.idade if idade is None else idade
+        distancia_centro_puff = puff.velocidade_vento * idade_calculo
         return a * distancia_centro_puff ** b
 
-    def calcular_sigma_z(self, puff: Puff):
+    def calcular_sigma_z(self, puff: Puff, idade=None):
         classe = puff.classe_estabilidade.upper()
         terreno = self.config.terreno.upper()
         coeficientes = self.obter_coeficientes_sigma(terreno, classe)
@@ -119,7 +248,8 @@ class GaussianPuffModel:
         c = coeficientes['c']
         d = coeficientes['d']
 
-        distancia_centro_puff = puff.velocidade_vento*puff.idade
+        idade_calculo = puff.idade if idade is None else idade
+        distancia_centro_puff = puff.velocidade_vento * idade_calculo
         return c * distancia_centro_puff ** d
 
     def obter_coeficientes_sigma(self, terreno, classe):
