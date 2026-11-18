@@ -1,0 +1,58 @@
+ARQUIVO COMPLEMENTAR
+
+Versão 1.3
+
+cenario_id:
+ANGRA1_TARDE_001
+
+descricao_instalacao_nuclear:
+Usina Nuclear Angra 1 - Central Nuclear Almirante Álvaro Alberto (CNAAA) - Praia de Itaorna - Angra dos Reis - RJ
+
+geolocalizacao_latitude:
+-23.0083333333
+
+geolocalizacao_longitude:
+-44.4738888889
+
+orientacao_eixo_x:
+Leste geográfico
+
+modo_geracao_meteorologico:
+sintetico_descritivo
+
+condicoes_meteorologicas:
+Tarde hipotética de primavera/verão na região costeira de Angra dos Reis, sem precipitação, com tempo parcialmente ensolarado e nebulosidade variável. Entre 12h e 14h, predominam períodos de insolação moderada a relativamente forte, intercalados com nuvens esparsas; após 14h, a cobertura de nuvens aumenta gradualmente, reduzindo o aquecimento da superfície. Temperatura do ar em torno de 27 °C às 12h, alcançando aproximadamente 29 °C no início da tarde e mantendo-se próxima desse valor até as 15h. Trata-se de um cenário meteorológico sintético e idealizado, sem pretensão de reproduzir medições de um dia histórico específico.
+Das 12h às 13h, atmosfera inicialmente neutra (classe D), evoluindo gradualmente para levemente instável (classe C) em função da insolação, com ventos fracos de velocidade média aproximada de 1,6 m/s. Considerar uma circulação costeira de brisa marítima já estabelecida no início do período.
+Das 13h às 14h, manutenção de condições predominantemente levemente instáveis (classe C), associadas ao aquecimento diurno e às aberturas de sol, com eventuais intervalos neutros (classe D) sob maior nebulosidade. Velocidade média do vento aproximada de 1,3 m/s, com redução gradual de intensidade em relação à hora anterior.
+Das 14h às 15h, enfraquecimento progressivo do aquecimento superficial devido ao aumento parcial da nebulosidade, com transição gradual de condições levemente instáveis (classe C) para neutras (classe D). Velocidade média do vento aproximada de 1,0 m/s, mantendo a tendência de redução suave até o final do período.
+As velocidades indicadas representam médias aproximadas de cada faixa horária, não patamares fixos. Em todos os 180 eventos puff, a sequência de velocidades deverá ser monotonicamente não crescente: cada evento terá velocidade inferior ou igual à do evento anterior, sem exceções, inclusive nas transições de horário. Admitir trechos curtos de velocidade aproximadamente constante e diferentes intensidades de redução, mas nunca aumentos entre eventos consecutivos. A evolução deve ser gradual, temporalmente contínua e manter todos os valores estritamente positivos, sem calmaria absoluta. A sequência deverá ser coerente com as médias horárias informadas, que também são decrescentes.
+Essa restrição é intencional e decorre da hipótese simplificadora do modelo computacional, segundo a qual cada puff conserva a velocidade e a direção do vento recebidas no instante de emissão. A monotonicidade do módulo da velocidade busca evitar que centros de puffs emitidos posteriormente ultrapassem radialmente os centros mais antigos, sem constituir uma afirmação sobre o comportamento obrigatório dos ventos reais.
+Ventos predominantemente provenientes do setor sul a sul-sudoeste, compatíveis com um regime costeiro de brisa marítima, transportando os puffs para norte a norte-nordeste. Para a convenção angular do modelo, utilizar direção de transporte de referência de 75° em relação ao eixo X positivo (leste geográfico), admitindo oscilações direcionais graduais de até ±15° ao redor dessa referência durante todo o período. O ângulo indica para onde o puff se desloca, e não de onde o vento sopra. Preservar continuidade temporal dos ângulos, sem saltos abruptos ou mudanças de quadrante injustificadas; pequenas oscilações suaves são desejáveis para produzir trajetória não perfeitamente retilínea. As alterações de direção não deverão interferir na restrição monotônica imposta à velocidade.
+A classe de estabilidade deverá evoluir de forma meteorologicamente coerente com a insolação, a nebulosidade e a hora do dia, sem oscilações aleatórias entre classes muito diferentes. Priorizar a sequência gradual D → C → D descrita acima, admitindo alternâncias pontuais apenas entre C e D. O predomínio de classe C nesse intervalo é uma hipótese específica deste cenário sintético e não deve ser apresentado como a condição climatológica predominante da CNAAA, cuja topografia costeira complexa não é resolvida explicitamente pelo modelo simplificado.
+
+fuso_horario:
+America/Sao_Paulo
+
+horario_inicio:
+12:00
+
+horario_fim:
+15:00
+
+numero_eventos:
+180
+
+delta_t_s:
+60
+
+isotopo:
+Xe-133
+
+tipo_terreno:
+rural
+
+atividade_total_Ci:
+1000000.0
+
+perfil_emissao:
+Vazamento hipotético de Xe-133 com atividade total de 300000,0 Ci liberada em 3 horas (180 intervalos de 60 segundos), equivalente a uma taxa média de aproximadamente 27,78 Ci/s. Adotar emissão inicialmente mais intensa, com taxa inicial próxima de 40 Ci/s, seguida de redução gradual aproximadamente linear ao longo do período, associada à atuação progressiva de medidas hipotéticas de contenção. A taxa nos últimos eventos deverá se aproximar de 15,6 Ci/s, admitindo pequenas oscilações suaves entre eventos sem alterar a tendência geral de redução. Converter as taxas em atividades totais por puff com base em delta_t_s = 60 segundos e normalizar os valores para garantir que a soma de atividade_emitida dos 180 eventos seja exatamente igual a 300000,0 Ci. As atividades atribuídas a cada puff representam quantidades totais em Ci, e não taxas em Ci/s.

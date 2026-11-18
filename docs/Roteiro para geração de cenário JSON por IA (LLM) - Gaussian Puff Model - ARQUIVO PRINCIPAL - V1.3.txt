@@ -1,0 +1,1013 @@
+ARQUIVO PRINCIPAL
+
+Versão 1.3
+
+As instruções deste arquivo são de caráter generalista e definem a sintaxe, os domínios e as regras do produto esperado: um arquivo JSON contendo um cabeçalho de metadados do cenário solicitado seguido de uma lista de atributos relativos a eventos consecutivos de emissão de jatos puff radioativos, que servirão de insumo para alimentar um modelo computacional python que simula o modelo matemático gaussian puff model de pluma radioativa no espaço bidimensional ao nível do solo para uma determinada geolocalização.
+
+Estas instruções (a seguir) deverão sempre ser acompanhadas por um segundo ARQUIVO COMPLEMENTAR contendo as informações específicas do cenário desejado configuradas pelo usuário humano em forma de uma lista de parâmetros que serão descritos a seguir.
+
+A denominação exata do arquivo complementar pode variar, mas em geral será o arquivo txt anexado em conjunto a este arquivo pelo usuário humano solicitante e terá denominação semelhante a deste arquivo, porém com termo ARQUIVO PRINCIPAL alterado para ARQUIVO COMPLEMENTAR.
+
+Verifique sempre se as versões desse arquivo e do complementar anexado em conjunto são correspondentes, se não, confirme com o usuário antes de executar a geração do JSON.
+
+O arquivo complementar deverá informar, no mínimo, os seguintes parâmetros:
+
+cenario_id
+descricao_instalacao_nuclear
+geolocalizacao_latitude
+geolocalizacao_longitude
+orientacao_eixo_x
+modo_geracao_meteorologico
+numero_eventos
+delta_t_s
+isotopo
+tipo_terreno
+atividade_total_Ci
+perfil_emissao
+fuso_horario
+horario_inicio
+
+Se o modo_geracao_meteorologico escolhido pelo usuário no arquivo complementar for sintetico_climatologico_historico, o arquivo complementar também devera conter:
+periodo_historico
+recorte_sazonal
+fonte_meteorologica
+criterio_representatividade (opcional)
+metodo_classe_estabilidade (opcional)
+
+Se o modo_geracao_meteorologico escolhido pelo usuário no arquivo complementar for sintetico_descritivo, o arquivo complementar também devera conter:
+condicoes_meteorologicas
+
+Caso o critério e o método sejam omitidos no modo “sintetico_climatologico_historico”, deverão ser adotados, respectivamente, “dia_historico_medoide” e “SRDT_EPA”.
+
+Quanto aos domínios do parâmetro modo_geracao_meteorologico, as duas opções serão:
+
+“sintetico_descritivo”
+
+As séries meteorológicas serão construídas de forma sintética, coerente e temporalmente contínua com base nas condições gerais fornecidas, sem que se alegue correspondência com registros históricos específicos, ou seja, sem a necessidade de captura de dados reais relativos a geolocalização e períodos informados.
+Neste modo, espera-se que o usuário humano editor do arquivo complementar descreva com clareza no parâmetro condicoes_meteorologicas as características meteorológicas esperadas para esse o cenário sintético desejado, como características de direção predominante do vento, vento médio aproximado e perfil de variação de classes de estabilidade entre os N eventos que comporão o período delta_t_s informado
+
+“sintetico_climatologico_historico”
+
+Modo destinado à criação de um cenário sintético plausível, condicionado pelo comportamento meteorológico observado ou reanalisado em um passado recente para a geolocalização, o período sazonal e a faixa horária solicitados. Nesse modo, a velocidade e a direção predominantes do vento não deverão ser escolhidas livremente e sim coletadas em bases de dados confiáveis adequadas a serem determinadas pela inteligência artificial leitora deste roteiro.
+
+Os atributos (que serão detalhados futuramente neste roteiro) velocidade_vento, angulo_vento e classe_estabilidade representam as condições meteorológicas no instante de emissão de um determinado objeto puff e permanecem constantes durante toda a vida do respectivo puff, conforme a hipótese simplificadora adotada pelo modelo computacional.
+
+A exigência de retorno exclusivo em JSON aplica-se somente quando todas as informações obrigatórias estiverem disponíveis e a geração puder ser concluída conforme as regras do roteiro. Caso contrário, informe objetivamente o impedimento, sem produzir um JSON incompleto ou baseado em dados históricos inventados.
+
+Caso o arquivo complementar não seja fornecido em conjunto a este roteiro, ou caso alguma informação indispensável esteja ausente, solicite ao usuário os dados faltantes antes de gerar o JSON.
+
+INSTRUÇÕES PARA GERAÇÃO DO JSON:
+
+O JSON produzido deverá conter duas partes:
+
+Um objeto denominado “metadados”, contendo as informações gerais do cenário;
+Uma lista denominada “eventos”, contendo exatamente N objetos Puff.
+
+FORMATO GERAL DO JSON
+
+A estrutura geral deverá seguir este formato:
+
+{
+"metadados": {
+...
+},
+"eventos": [
+...
+]
+}
+
+FORMATO E SINTAXE DO OBJETO "METADADOS"
+
+O objeto “metadados” deverá conter os seguintes atributos:
+
+1 - “cenario_id”
+
+String utilizada para identificar de forma única o cenário.
+
+O identificador deverá ser informado no arquivo complementar.
+
+Exemplo:
+
+"IEN_TARDE_ENSOLARADA_001"
+
+2 - “descricao_resumida”
+
+String contendo uma descrição breve do cenário atmosférico e acidental simulado, além da instalação nuclear escolhida
+
+Exemplo:
+
+"Acidente hipotético vespertino no Instituto de Engenharia Nuclear (IEN) na Ilha do Fundão - Rio de Janeiro - RJ, com duração de 6 horas, vento fraco predominantemente a nordeste e emissão decrescente de Iodo-131."
+
+3 - “latitude”
+
+Número real que representa a latitude da geolocalização informada.
+
+Exemplo:
+
+-22.865567878788333
+
+4 - “longitude”
+
+Número real que representa a longitude da geolocalização informada.
+
+Exemplo:
+
+-43.22670557195911
+
+5 - “orientacao_eixo_x”
+
+String que descreve a orientação do eixo X positivo do modelo computacional.
+
+Exemplo:
+
+"Leste geográfico"
+
+6 - “horario_inicio”
+
+String no formato HH:MM, indicando o horário de início do acidente.
+
+Exemplo:
+
+"12:00"
+
+7 - “horario_fim”
+
+String no formato HH:MM, indicando o horário final do acidente.
+
+Exemplo:
+
+"18:00"
+
+calcular horario_fim pela relação: horario_fim = (horario_inicio + N * delta_t_s segundos) mod 24 horas
+
+considerando o modelo de 24h (após 23h, vem 00h), exemplos: 
+horario_inicio as 06:00 com 12 eventos (N = 12) e delta_t_s = 300 segundos (ou seja, com duração total de = 3600 segundo) -> logo horario_fim será as 07:00
+horario_inicio as 23:15 com 24 eventos (N = 24) e delta_t_s = 300 segundos (ou seja, com duração total de = 7200 segundo) -> logo horario_fim será as 01:15
+
+caso um horario_fim seja fornecido no arquivo COMPLEMENTAR, ele deverá coincidir com o horário calculado, se não, considerar o calculado
+
+8 - “duracao_total_s”
+
+Número inteiro positivo que representa a duração total do cenário em segundos.
+
+A duração deverá obedecer à relação:
+
+duracao_total_s = N * delta_t_s
+
+9 - “numero_eventos”
+
+Número inteiro positivo que representa o número total de eventos Puff gerados.
+
+10 - “delta_t_s”
+
+Número inteiro positivo que representa, em segundos, o intervalo entre duas emissões Puff consecutivas.
+
+11 - “isotopo”
+
+String que identifica o radionuclídeo considerado.
+
+Exemplo:
+
+"I-131"
+
+12 - “atividade_total_Ci”
+
+Número real não negativo que representa a atividade radioativa total, em Curie, distribuída entre todos os eventos Puff.
+
+Deverá ser obedecida a relação onde soma de atividade_emitida de todos os eventos = atividade_total_Ci
+Distribua a atividade total utilizando pesos não negativos coerentes com o perfil de emissão solicitado. 
+Normalize os pesos para que a soma das atividades seja igual a atividade_total_Ci e ajuste eventuais diferenças de arredondamento sem produzir valores negativos ou distorcer o perfil.
+
+13 - “tipo_terreno”
+
+String que identifica o tipo de terreno utilizado na parametrização das classes de estabilidade e dos coeficientes de dispersão.
+
+O valor esperado será "rural" ou "urbano"
+
+14 - “condicoes_meteorologicas”
+
+String contendo um resumo do parâmetro condicoes_meteorologicas informado no arquivo complementar (no modo sintético descritivo)
+
+Caso o modo sintetico_climatologico_historico tenha sido escolhido pelo usuário no arquivo complementar, essa mesma string deverá registrar resumidamente a procedência histórica e metodológica definida na seção correspondente, sem inclusão de novos atributos nos metadados.
+
+Exemplo para modo sintetico_descritivo: "Tarde ensolarada, com vento fraco predominantemente a nordeste, baixa variabilidade direcional e evolução gradual da estabilidade atmosférica."
+
+Exemplo para modo sintetico_climatologico_historico: "Cenário sintético condicionado por dados históricos horários da fonte selecionada, período de 2015 a 2024, com dia histórico medóide utilizado como referência, reamostragem para delta_t_s e classes de estabilidade calculadas pelo método SRDT da EPA."
+
+15 - “perfil_emissao”
+
+String contendo uma descrição resumida do perfil temporal adotado para a atividade emitida.
+
+Exemplos:
+
+"Emissão inicialmente elevada, seguida de redução gradual."
+
+"Emissão aproximadamente constante durante todo o acidente."
+
+"Emissão crescente nas primeiras duas horas, seguida de estabilização e contenção."
+
+16 - “modelo_gerador”
+
+String que identifica a LLM utilizada para produzir o cenário.
+
+Quando conhecida, deverá conter o nome do modelo utilizado.
+
+Exemplo:
+
+"Chat GPT 6 - modo de raciocínio alto"
+
+17 - “versao_roteiro”
+
+String que identifica a versão destas instruções e do arquivo complementar que serviram de base para o JSON gerado.
+
+Exemplo:
+
+"1.3"
+
+18 - “data_geracao”
+
+String contendo a data em que o JSON foi gerado, no formato AAAA-MM-DD.
+
+FORMATO E SINTAXE DA LISTA DE OBJETOS “EVENTOS”
+
+A lista “eventos” deverá conter exatamente N (numero_eventos) objetos.
+
+Todos os objetos deverão conter os mesmos atributos, na seguinte ordem obrigatória:
+
+“evento”
+“idade”
+“atividade_emitida”
+“velocidade_vento”
+“angulo_vento”
+“classe_estabilidade”
+
+Nenhum atributo adicional deverá ser incluído nos objetos da lista “eventos”.
+
+1 - ATRIBUTO “evento”
+
+O atributo “evento” deverá ser um número inteiro no intervalo de 0 até N - 1, sendo N o número total de jatos puff discretos gerados para o cenário.
+
+Regras:
+
+O primeiro elemento da lista deverá ter:
+
+“evento”: 0
+
+O último elemento da lista deverá ter:
+
+“evento”: N - 1
+
+Os valores deverão ser sequenciais, sem repetições e sem intervalos.
+
+A lista deverá estar ordenada de forma crescente pelo atributo “evento”.
+
+Domínio:
+
+0 <= evento <= N - 1
+
+Exemplo para N = 12:
+
+0, 1, 2, 3, ..., 11
+
+2 - ATRIBUTO “idade”
+
+O atributo “idade” deverá ser um número inteiro positivo que representa, em segundos, o tempo decorrido entre a emissão do puff e o instante final de avaliação do cenário.
+
+A lista deverá estar ordenada do puff mais antigo para o puff mais recente.
+
+A idade de cada puff deverá ser calculada por:
+
+idade = (N - evento) * delta_t_s
+
+Onde:
+
+N é o número total de puffs do cenário;
+
+evento é o índice do puff na lista;
+
+delta_t_s é o intervalo, em segundos, entre duas emissões consecutivas.
+
+Convenção temporal adotada:
+
+O evento 0 representa o primeiro puff emitido.
+
+O evento 1 representa o segundo puff emitido.
+
+O evento N - 1 representa o último puff emitido.
+
+O campo final será avaliado após o término do último intervalo delta_t_s. Por essa razão, o puff mais recente terá idade igual a delta_t_s, e nunca idade igual a zero.
+
+Regras:
+
+O puff de evento 0 será o mais antigo e terá a maior idade.
+
+O puff de evento N - 1 será o mais recente e terá idade igual a delta_t_s.
+
+As idades deverão diminuir exatamente delta_t_s segundos entre dois eventos consecutivos.
+
+Nunca deverá existir um puff com idade igual a zero.
+
+Todos os valores de idade deverão ser múltiplos inteiros de delta_t_s.
+
+Relação entre eventos consecutivos:
+
+idade_do_evento_seguinte = idade_do_evento_atual - delta_t_s
+
+Domínio:
+
+delta_t_s <= idade <= N * delta_t_s
+
+Exemplo para:
+
+N = 12
+
+delta_t_s = 300 segundos
+
+Os valores deverão ser:
+
+evento 0 -> idade 3600
+
+evento 1 -> idade 3300
+
+evento 2 -> idade 3000
+
+evento 3 -> idade 2700
+
+evento 4 -> idade 2400
+
+evento 5 -> idade 2100
+
+evento 6 -> idade 1800
+
+evento 7 -> idade 1500
+
+evento 8 -> idade 1200
+
+evento 9 -> idade 900
+
+evento 10 -> idade 600
+
+evento 11 -> idade 300
+
+3 - ATRIBUTO “atividade_emitida”
+
+O atributo “atividade_emitida” deverá ser um número real não negativo que representa a atividade radioativa total emitida pelo puff para o isótopo de interesse.
+
+A atividade será interpretada pelo modelo computacional como sendo dada sempre em Ci, Curie.
+
+Cada valor representa uma atividade total associada ao puff, e não uma taxa de emissão em Ci/s.
+
+Domínio:
+
+0.0 <= atividade_emitida <= atividade_total_Ci
+
+A soma das atividades emitidas por todos os eventos deverá ser igual ao valor “atividade_total_Ci” informado nos metadados:
+
+soma de atividade_emitida de todos os eventos = atividade_total_Ci
+
+A inteligência artificial deverá distribuir a atividade total entre os N eventos de maneira coerente com as características do vazamento descritas no arquivo complementar.
+
+A evolução entre eventos consecutivos deverá apresentar continuidade temporal. Não deverão ser geradas oscilações aleatórias abruptas sem justificativa física.
+
+O perfil poderá apresentar, conforme o cenário solicitado:
+
+Emissão inicialmente elevada seguida de redução gradual;
+Crescimento inicial seguido de um patamar;
+Pico de emissão seguido de contenção;
+Emissão aproximadamente constante;
+Pequenas flutuações ao redor de uma tendência principal.
+
+Caso seja permitido um valor igual a zero, esse valor representará um intervalo sem emissão radioativa relevante. O objeto deverá permanecer na lista para preservar a discretização temporal do cenário.
+
+O montante absoluto total não deverá ser criado livremente pela LLM. Ele deverá ser obtido do atributo “atividade_total_Ci”, informado pelo solicitante.
+
+Exemplo para N = 12 e atividade total previamente definida:
+
+evento 0 -> 20.0
+
+evento 1 -> 18.5
+
+evento 2 -> 16.6
+
+evento 3 -> 15.0
+
+...
+
+evento 10 -> 11.5
+
+evento 11 -> 10.0
+
+Os valores acima são apenas ilustrativos e deverão ser normalizados para que a soma corresponda exatamente à atividade total definida para o cenário.
+
+4 - ATRIBUTO “velocidade_vento”
+
+O atributo “velocidade_vento” deverá ser um número real positivo que representa o módulo da velocidade do vento no instante de emissão do evento Puff.
+
+A velocidade será interpretada pelo modelo computacional como sendo dada sempre em m/s, metros por segundo.
+
+Domínio:
+
+velocidade_minima_modelo <= velocidade_vento <= valor_maximo_coerente_com_o_cenario
+
+A velocidade mínima aceita deverá ser maior que zero.
+
+Não deverá ser utilizado valor igual a 0.0, pois a ausência total de deslocamento pode produzir problemas físicos ou numéricos no cálculo da distância percorrida e dos coeficientes de dispersão.
+
+Caso o arquivo complementar não forneça um limite mínimo operacional, deverá ser adotado um valor pequeno, positivo e fisicamente justificável, evitando velocidades exatamente nulas.
+
+O módulo do vento deverá variar entre eventos consecutivos de maneira compatível com o comportamento natural esperado para o cenário atmosférico proposto.
+
+A sequência deverá possuir persistência temporal. O valor de um evento deverá estar relacionado ao valor do evento anterior, evitando sorteios independentes e mudanças abruptas sem justificativa.
+
+Em um cenário de vento calmo e relativamente persistente, são esperadas variações pequenas entre eventos consecutivos.
+
+Em cenários mais turbulentos ou associados a mudanças meteorológicas, poderão ocorrer variações maiores, desde que progressivas e coerentes com a descrição geral.
+
+A velocidade do vento não deverá ser definida apenas com base na classe de estabilidade. Horário, insolação, cobertura de nuvens, características locais e descrição meteorológica também deverão ser considerados.
+
+No modo “sintetico_climatologico_historico”, a sequência deverá ser derivada do dia histórico medóide e reamostrada para delta_t_s conforme as regras específicas deste roteiro. A velocidade não deverá ser escolhida livremente pela inteligência artificial.
+
+Exemplo para:
+
+N = 12
+
+Manhã de um dia ensolarado com vento fraco e comportamento relativamente persistente:
+
+evento 0 -> 0.5
+
+evento 1 -> 0.6
+
+evento 2 -> 0.9
+
+evento 3 -> 1.0
+
+evento 4 -> 1.1
+
+evento 5 -> 0.8
+
+evento 6 -> 0.7
+
+...
+
+evento 10 -> 1.2
+
+evento 11 -> 1.1
+
+5 - ATRIBUTO “angulo_vento”
+
+O atributo “angulo_vento” deverá ser um número real não negativo que representa a direção para a qual o puff será transportado pelo vento no instante de sua emissão.
+
+O atributo não representa a direção meteorológica de onde o vento se origina. Ele representa diretamente a direção vetorial do deslocamento do centro geométrico do puff.
+
+O valor será interpretado pelo modelo computacional como sendo dado em graus, no intervalo de 0 até menos de 360 graus.
+
+A referência angular deverá seguir estas convenções:
+
+0 graus = direção do eixo X positivo do modelo;
+
+90 graus = direção do eixo Y positivo do modelo;
+
+180 graus = direção do eixo X negativo do modelo;
+
+270 graus = direção do eixo Y negativo do modelo.
+
+Para o cenário do Instituto de Engenharia Nuclear, quando o eixo X positivo estiver orientado para o leste geográfico:
+
+0 graus = leste;
+
+90 graus = norte;
+
+180 graus = oeste;
+
+270 graus = sul.
+
+Os ângulos deverão crescer no sentido anti-horário.
+
+As componentes cartesianas do vento serão posteriormente calculadas pelo modelo computacional por:
+
+u_x = velocidade_vento * cos(angulo_vento)
+
+u_y = velocidade_vento * sin(angulo_vento)
+
+O código será responsável por converter o valor de graus para radianos antes de aplicar seno e cosseno.
+
+Domínio:
+
+0.0 <= angulo_vento < 360.0
+
+A sequência angular deverá variar de maneira fisicamente compatível com o cenário atmosférico solicitado.
+
+As alterações entre eventos consecutivos deverão possuir continuidade temporal e não deverão apresentar mudanças abruptas sem justificativa meteorológica.
+
+A periodicidade angular deverá ser considerada corretamente.
+
+Exemplo:
+
+Uma transição de 359 graus para 1 grau representa uma alteração de apenas 2 graus, e não uma alteração abrupta de 358 graus.
+
+Em dias de vento persistente, são esperadas pequenas oscilações em torno de uma direção predominante.
+
+Em cenários de mudança gradual da direção do vento, a sequência poderá apresentar uma tendência de rotação progressiva.
+
+No modo “sintetico_climatologico_historico”, a direção predominante e sua evolução deverão ser obtidas das componentes vetoriais do dia histórico medóide. A geolocalização, isoladamente, não autoriza a escolha livre de uma direção média.
+
+Exemplo para:
+
+N = 12
+
+Manhã de um dia ensolarado com vento relativamente persistente:
+
+evento 0 -> 45.0
+
+evento 1 -> 45.6
+
+evento 2 -> 46.9
+
+evento 3 -> 47.0
+
+evento 4 -> 46.9
+
+evento 5 -> 45.6
+
+evento 6 -> 45.7
+
+...
+
+evento 10 -> 40.0
+
+evento 11 -> 39.8
+
+6 - ATRIBUTO “classe_estabilidade”
+
+O atributo “classe_estabilidade” deverá ser uma string contendo um único caractere alfabético maiúsculo.
+
+Esse atributo representa a classe de estabilidade atmosférica de Pasquill-Gifford utilizada no modelo de dispersão.
+
+Em conjunto com os coeficientes de dispersão definidos a partir das parametrizações utilizadas no modelo, a classe de estabilidade será empregada no cálculo da dispersão horizontal e vertical do puff.
+
+A classe de estabilidade deverá ser escolhida de maneira coerente com o cenário meteorológico descrito no arquivo complementar.
+
+A escolha deverá considerar, quando essas informações estiverem disponíveis:
+
+Período diurno ou noturno;
+Horário do dia;
+Intensidade da insolação;
+Cobertura de nuvens;
+Velocidade do vento;
+Evolução meteorológica ao longo do período;
+Condição geral de estabilidade ou instabilidade solicitada.
+
+A classe de estabilidade não deverá ser escolhida apenas com base na variabilidade do módulo ou da direção do vento.
+
+No modo “sintetico_climatologico_historico”, quando o método definido for “SRDT_EPA”, a classe deverá ser calculada conforme a tabela e as condições estabelecidas na seção “CLASSIFICAÇÃO DE ESTABILIDADE PELO MÉTODO SRDT DA EPA”. A descrição textual do cenário poderá orientar a filtragem dos dias históricos, mas não deverá sobrescrever arbitrariamente a classe calculada.
+
+As classes deverão variar com continuidade temporal. Transições abruptas entre classes muito distantes deverão ser evitadas, salvo quando houver uma mudança meteorológica explicitamente descrita no cenário.
+
+Por exemplo, deverá ser evitada uma sequência como:
+
+F -> A -> F -> B
+
+em intervalos curtos, quando não houver justificativa meteorológica.
+
+Transições graduais como estas são preferíveis:
+
+F -> E -> D -> C
+
+C -> D -> E
+
+D -> C -> B
+
+Domínio:
+
+"A" = muito instável
+
+"B" = moderadamente instável
+
+"C" = levemente instável
+
+"D" = neutra
+
+"E" = levemente estável
+
+"F" = muito estável
+
+Somente os valores "A", "B", "C", "D", "E" ou "F" serão aceitos.
+
+Exemplo para:
+
+N = 12
+
+Período com atmosfera variando entre neutra e estável:
+
+evento 0 -> "D"
+
+evento 1 -> "D"
+
+evento 2 -> "C"
+
+evento 3 -> "D"
+
+evento 4 -> "D"
+
+evento 5 -> "E"
+
+evento 6 -> "E"
+
+...
+
+evento 10 -> "D"
+
+evento 11 -> "C"
+
+COERÊNCIA ENTRE OS ATRIBUTOS
+
+
+Os atributos não deverão ser gerados como séries aleatórias independentes.
+
+As sequências de “velocidade_vento”, “angulo_vento”, “classe_estabilidade” e “atividade_emitida” deverão apresentar tendências temporais coerentes com o cenário complementar.
+
+A atividade emitida deverá seguir a evolução física do vazamento.
+
+A velocidade e a direção do vento deverão apresentar persistência entre eventos consecutivos.
+
+A classe de estabilidade deverá evoluir de acordo com as condições meteorológicas, e não apenas acompanhar diretamente as oscilações do vento.
+
+Pequenas flutuações naturais poderão ser acrescentadas, desde que não destruam a tendência geral do cenário.
+
+A geração deverá privilegiar uma sequência temporal suave e fisicamente interpretável, evitando ruído aleatório excessivo.
+
+No modo “sintetico_climatologico_historico”, a coerência conjunta deverá ser preservada a partir do mesmo dia medóide e da mesma linha temporal. Não deverão ser combinados, sem justificativa, vento de um dia, radiação de outro e classes de estabilidade escolhidas independentemente.
+
+VALIDAÇÕES OBRIGATÓRIAS ANTES DA RESPOSTA
+
+Antes de apresentar o JSON, verifique internamente se todas as condições abaixo foram atendidas:
+
+O objeto “metadados” está presente;
+A lista “eventos” está presente;
+A lista contém exatamente N (numero_eventos) objetos;
+Os eventos estão numerados de 0 até N - 1;
+Não existem eventos repetidos;
+Não existem eventos ausentes;
+Os objetos estão ordenados de forma crescente pelo atributo “evento”;
+Todos os objetos possuem exatamente os seis atributos exigidos;
+A ordem dos atributos é a mesma em todos os objetos;
+As idades obedecem à fórmula definida;
+Nenhuma idade é igual a zero;
+Todas as idades são múltiplas de delta_t_s;
+A velocidade do vento é sempre maior que zero;
+Todos os ângulos estão no intervalo de 0 até menos de 360 graus;
+A periodicidade angular foi considerada;
+Todas as classes de estabilidade pertencem ao conjunto permitido;
+Todas as atividades emitidas são maiores ou iguais a zero;
+A soma das atividades corresponde ao valor “atividade_total_Ci”;
+Não existem valores null;
+Não existem valores NaN;
+Não existem valores Infinity;
+Não existem strings vazias;
+Não existem atributos adicionais nos objetos da lista “eventos”;
+Não existem comentários dentro do JSON;
+O resultado constitui um JSON sintaticamente válido.
+
+Quando o modo for “sintetico_climatologico_historico”, verifique adicionalmente:
+
+Os dados históricos externos foram efetivamente consultados;
+O período histórico, o recorte sazonal e o fuso horário foram respeitados;
+O dia histórico medóide foi selecionado entre dias que satisfazem os filtros definidos;
+Velocidade e direção foram reamostradas por componentes cartesianas;
+A resolução delta_t_s foi tratada corretamente, seja por interpolação, uso direto ou agregação;
+As classes de estabilidade foram obtidas pelo método definido;
+O parâmetro condicoes_meteorologicas registra a fonte, o período, o dia medóide, a reamostragem e o método de estabilidade;
+Nenhum atributo foi acrescentado ao layout do JSON para registrar essas informações.
+
+REQUISITOS DA RESPOSTA
+
+Retorne exclusivamente o conteúdo do JSON válido.
+
+Não utilize blocos de código Markdown.
+
+Não escreva ```json antes do conteúdo.
+
+Não escreva ``` depois do conteúdo.
+
+Não inclua explicações, justificativas, observações ou comentários antes ou depois do JSON.
+
+Use exatamente os nomes de atributos especificados.
+
+Utilize ponto como separador decimal.
+
+Não utilize vírgula como separador decimal.
+
+Todos os objetos da lista “eventos” deverão conter todos os atributos.
+
+Não omita eventos para abreviar a resposta.
+
+Não utilize reticências.
+
+Não escreva expressões como “demais eventos seguem o padrão”.
+
+Gere explicitamente todos os N objetos.
+
+REFERÊNCIA METODOLÓGICA PARA ESTABILIDADE
+
+A tabela SRDT incorporada neste roteiro segue a metodologia apresentada pela U.S. Environmental Protection Agency em “Meteorological Monitoring Guidance for Regulatory Modeling Applications”, Seção 6.4.2, Tabela 6-7.
+
+A aplicação neste roteiro tem finalidade de geração de cenários computacionais acadêmicos. Caso o modelo seja empregado em aplicação regulatória, operacional ou de segurança real, deverão ser observadas as exigências da autoridade competente e a adequação dos dados meteorológicos ao local.
+
+ESTRUTURA JSON DE EXEMPLO
+
+O exemplo abaixo representa um cenário com:
+
+N = 12
+
+delta_t_s = 300 segundos
+
+duracao_total_s = 3600 segundos
+
+atividade_total_Ci = 99.0 Ci
+
+Os valores são exclusivamente ilustrativos.
+
+{
+"metadados": {
+"cenario_id": "IEN_EXEMPLO_001",
+"descricao_resumida": "Acidente matutino no IEN, com duração de 1 hora, vento fraco a moderado predominante para nordeste e emissão decrescente de I-131",
+"latitude": -22.865567878788333,
+"longitude": -43.22670557195911,
+"orientacao_eixo_x": "Leste geográfico",
+"horario_inicio": "06:00",
+"horario_fim": "07:00",
+"duracao_total_s": 3600,
+"numero_eventos": 12,
+"delta_t_s": 300,
+"isotopo": "I-131",
+"atividade_total_Ci": 99.0,
+"tipo_terreno": "rural",
+"condicoes_meteorologicas": "Período matutino com vento fraco, direção relativamente persistente e atmosfera entre levemente instável e neutra",
+"perfil_emissao": "Emissão inicialmente mais elevada, seguida de redução gradual linear até aproximadamente 50% do valor de emissão inicial",
+"modelo_gerador": "Chat GPT 6 - modo de raciocínio alto",
+"versao_roteiro": "1.3",
+"data_geracao": "2026-11-05"
+},
+"eventos": [
+{
+"evento": 0,
+"idade": 3600,
+"atividade_emitida": 11.0,
+"velocidade_vento": 0.7,
+"angulo_vento": 45.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 1,
+"idade": 3300,
+"atividade_emitida": 10.5,
+"velocidade_vento": 0.8,
+"angulo_vento": 46.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 2,
+"idade": 3000,
+"atividade_emitida": 10.0,
+"velocidade_vento": 0.7,
+"angulo_vento": 47.0,
+"classe_estabilidade": "C"
+},
+{
+"evento": 3,
+"idade": 2700,
+"atividade_emitida": 9.5,
+"velocidade_vento": 0.9,
+"angulo_vento": 46.0,
+"classe_estabilidade": "C"
+},
+{
+"evento": 4,
+"idade": 2400,
+"atividade_emitida": 9.0,
+"velocidade_vento": 1.0,
+"angulo_vento": 45.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 5,
+"idade": 2100,
+"atividade_emitida": 8.5,
+"velocidade_vento": 1.2,
+"angulo_vento": 44.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 6,
+"idade": 1800,
+"atividade_emitida": 8.0,
+"velocidade_vento": 1.3,
+"angulo_vento": 43.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 7,
+"idade": 1500,
+"atividade_emitida": 7.5,
+"velocidade_vento": 1.2,
+"angulo_vento": 40.0,
+"classe_estabilidade": "E"
+},
+{
+"evento": 8,
+"idade": 1200,
+"atividade_emitida": 7.0,
+"velocidade_vento": 1.1,
+"angulo_vento": 37.5,
+"classe_estabilidade": "E"
+},
+{
+"evento": 9,
+"idade": 900,
+"atividade_emitida": 6.5,
+"velocidade_vento": 1.0,
+"angulo_vento": 35.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 10,
+"idade": 600,
+"atividade_emitida": 6.0,
+"velocidade_vento": 0.9,
+"angulo_vento": 36.0,
+"classe_estabilidade": "D"
+},
+{
+"evento": 11,
+"idade": 300,
+"atividade_emitida": 5.5,
+"velocidade_vento": 1.0,
+"angulo_vento": 37.5,
+"classe_estabilidade": "C"
+}
+]
+}
+
+A PARTIR DAQUI, INSTRUÇÕES RELEVANTES APENAS PARA CASO DE modo_geracao_meteorologico SER O sintetico_climatologico_historico (termo equivalente a SINTÉTICO CLIMATOLOGICAMENTE CONDICIONADO)
+
+CASO modo_geracao_meteorologico SEJA sintetico_descritivo, IGNORE O QUE VEM A SEGUIR NESTE ROTEIRO
+
+GERAÇÃO SINTÉTICA CLIMATOLOGICAMENTE CONDICIONADA
+
+Quando o modo selecionado for “sintetico_climatologico_historico”, a inteligência artificial deverá consultar dados meteorológicos históricos externos antes de construir a lista de eventos. O acesso aos dados históricos será parte obrigatória da geração.
+
+Caso não seja possível acessar fontes adequadas, não deverão ser atribuídos silenciosamente valores arbitrários à velocidade, à direção do vento ou à classe de estabilidade. A limitação deverá ser informada ao usuário, solicitando autorização para utilizar o modo “sintetico_descritivo” ou para modificar as fontes e os filtros ou para descrever sinteticamente apenas os dados que não puderam ser gerados.
+
+HIERARQUIA E SELEÇÃO DAS FONTES METEOROLÓGICAS
+
+A fonte primária deverá ser selecionada conforme a seguinte ordem de preferência:
+
+1. Estação meteorológica observacional próxima da geolocalização, desde que possua resolução temporal, período de operação, completude e variáveis adequadas ao cenário;
+2. Reanálise meteorológica horária ERA5 ou produto oficial equivalente, contendo preferencialmente as componentes zonal e meridional do vento a 10 m e a radiação solar necessária;
+3. NASA POWER ou outro produto histórico oficial por coordenadas, desde que possua resolução e variáveis compatíveis.
+
+A distância da estação, sua altitude, a altura do anemômetro, a presença de falhas e a representatividade do entorno deverão ser consideradas. A estação mais próxima não deverá ser escolhida automaticamente se seus dados forem incompletos ou pouco representativos.
+
+Deverá ser utilizada preferencialmente uma única fonte primária para manter consistência interna. Uma fonte suplementar poderá ser empregada somente para fornecer uma variável ausente necessária à classificação da estabilidade, desde que a combinação seja explicitada na descrição meteorológica.
+
+Os horários deverão ser convertidos para o fuso informado no arquivo complementar antes da seleção dos dias e da construção dos eventos.
+
+FILTRAGEM DOS DIAS HISTÓRICOS CANDIDATOS
+
+Os registros históricos deverão ser filtrados conforme:
+
+Geolocalização;
+Período histórico informado;
+Recorte sazonal ou meses informados;
+Faixa horária local do cenário;
+Condições meteorológicas gerais descritas no arquivo complementar;
+Disponibilidade de uma série completa ou suficientemente íntegra para a faixa horária considerada.
+
+Quando aplicável, descrições como “ensolarado”, “sem chuva”, “nublado”, “vento fraco” ou “vento persistente” deverão ser transformadas em filtros baseados nas variáveis disponíveis, como radiação solar, precipitação, nebulosidade, velocidade do vento e persistência vetorial. Os limiares adotados deverão ser coerentes com a fonte, a estação do ano e a região, evitando valores universais arbitrários.
+
+SELEÇÃO DO DIA HISTÓRICO MEDÓIDE
+
+Quando o critério de representatividade for “dia_historico_medoide”, deverá ser selecionado um único dia real do conjunto filtrado para servir como espinha dorsal meteorológica do cenário sintético.
+
+Para cada dia candidato, deverá ser construído um vetor temporal com as variáveis relevantes disponíveis durante a faixa horária do cenário. O vetor deverá incluir, no mínimo, as componentes cartesianas do vento e a variável radiativa utilizada na classificação de estabilidade. Precipitação, nebulosidade, temperatura e outras grandezas poderão ser utilizadas quando forem necessárias para representar as condições solicitadas.
+
+As variáveis deverão ser normalizadas antes da comparação para impedir que diferenças de unidade ou escala dominem indevidamente a distância entre os dias.
+
+O medóide será o dia candidato cuja soma das distâncias normalizadas em relação aos demais dias candidatos seja mínima. Por ser um dia realmente existente, o medóide deverá ser preferido à combinação independente de médias ou medianas horárias que possa produzir uma sequência meteorológica internamente incompatível.
+
+A direção do vento nunca deverá ser comparada por média aritmética simples de ângulos. A comparação deverá utilizar as componentes vetoriais do vento.
+
+Caso nenhum dia satisfaça os filtros com qualidade suficiente, os critérios não deverão ser relaxados silenciosamente. A inteligência artificial deverá informar quais filtros impediram a seleção e solicitar autorização antes de ampliá-los.
+
+CONVERSÃO E CONVENÇÃO DA DIREÇÃO DO VENTO
+
+Quando a fonte disponibilizar diretamente as componentes geográficas do transporte, deverá ser adotada a convenção:
+
+u_leste = componente positiva para leste;
+v_norte = componente positiva para norte.
+
+Para eixo X positivo orientado para leste e eixo Y positivo orientado para norte, o ângulo do modelo deverá ser calculado por:
+
+angulo_vento = atan2(v_norte, u_leste)
+
+O resultado deverá ser convertido para graus e normalizado para o intervalo de 0 até menos de 360 graus.
+
+Quando a orientação do eixo X for diferente de leste, as componentes deverão ser rotacionadas para o sistema de coordenadas do modelo antes do cálculo do ângulo.
+
+Quando a fonte fornecer apenas a direção meteorológica D_met, medida em graus no sentido horário a partir do norte e indicando de onde o vento se origina, deverá ser obtida inicialmente a direção geográfica de transporte:
+
+D_transporte = (D_met + 180) mod 360
+
+Para o caso específico em que o eixo X positivo esteja orientado para leste, a conversão será:
+
+angulo_vento = (270 - D_met) mod 360
+
+A direção registrada em “angulo_vento” deverá sempre indicar para onde o centro do puff será transportado, e nunca de onde o vento se origina.
+
+ADEQUAÇÃO À RESOLUÇÃO TEMPORAL DELTA_T_S
+
+O procedimento deverá funcionar para qualquer valor positivo de delta_t_s e para qualquer número N de eventos, desde que seja obedecida a relação de duração definida neste roteiro.
+
+O instante nominal de emissão do evento deverá ser considerado como:
+
+t_evento = horario_inicio + evento * delta_t_s
+
+Antes da reamostragem, velocidade e direção deverão ser representadas por componentes cartesianas. Não deverá ser realizada interpolação direta dos ângulos.
+
+Quando delta_t_s for menor que a resolução temporal da fonte, as componentes do vento e as demais variáveis meteorológicas necessárias deverão ser interpoladas nos instantes dos eventos. A interpolação deverá ser temporalmente contínua e não deverá extrapolar para fora do período histórico disponível.
+
+Quando delta_t_s for igual à resolução da fonte, os registros compatíveis poderão ser utilizados diretamente, após as conversões de unidade, fuso e convenção angular.
+
+Quando delta_t_s for maior que a resolução da fonte, os registros contidos em cada intervalo de emissão deverão ser agregados por média temporal ponderada. O vento deverá ser agregado por suas componentes cartesianas, e não pela média direta dos ângulos.
+
+Após a reamostragem, deverão ser reconstruídos:
+
+velocidade_vento = raiz_quadrada(u_x² + u_y²)
+
+angulo_vento = atan2(u_y, u_x), convertido para graus e normalizado.
+
+Pequenas perturbações sintéticas poderão ser acrescentadas para evitar uma sequência artificialmente linear quando a fonte possuir resolução mais grosseira que delta_t_s. Essas perturbações deverão:
+
+Ser suaves e auto correlacionadas no tempo;
+Permanecer dentro da variabilidade observada entre os dias históricos candidatos;
+Não modificar a direção predominante ou a evolução principal do dia medóide;
+Não produzir velocidade nula ou negativa;
+Utilizar uma semente determinística derivada de “cenario_id”, de modo que o mesmo pedido seja reproduzível.
+
+Caso a variabilidade histórica necessária para limitar as perturbações não possa ser estimada, deverá ser mantida apenas a interpolação ou agregação, sem criação arbitrária de ruído.
+
+CLASSIFICAÇÃO DE ESTABILIDADE PELO MÉTODO SRDT DA EPA
+
+Quando “metodo_classe_estabilidade” for “SRDT_EPA”, a classe de Pasquill-Gifford deverá ser derivada para cada evento a partir das variáveis meteorológicas reamostradas, e não escolhida apenas por interpretação textual.
+
+O vento utilizado no método deverá representar preferencialmente a velocidade a 10 m ou próxima dessa altura.
+
+Para o período diurno, deverão ser utilizadas a velocidade do vento e a radiação solar global incidente, conforme a tabela abaixo. Os limites deverão ser interpretados de modo contínuo, sem sobreposição:
+
+RADIAÇÃO SOLAR DIURNA
+
+Faixa R1: radiação >= 925 W/m²
+Faixa R2: 675 W/m² <= radiação < 925 W/m²
+Faixa R3: 175 W/m² <= radiação < 675 W/m²
+Faixa R4: radiação < 175 W/m², desde que o instante ainda seja classificado como diurno
+
+CLASSE DE ESTABILIDADE DIURNA
+
+velocidade < 2 m/s: R1 -> A; R2 -> A; R3 -> B; R4 -> D
+2 m/s <= velocidade < 3 m/s: R1 -> A; R2 -> B; R3 -> C; R4 -> D
+3 m/s <= velocidade < 5 m/s: R1 -> B; R2 -> B; R3 -> C; R4 -> D
+5 m/s <= velocidade < 6 m/s: R1 -> C; R2 -> C; R3 -> D; R4 -> D
+velocidade >= 6 m/s: R1 -> C; R2 -> D; R3 -> D; R4 -> D
+
+A separação entre período diurno e noturno deverá considerar o horário local e a posição solar, evitando classificar automaticamente a radiação nula da noite como faixa diurna R4.
+
+Para o período noturno, o SRDT requer a diferença vertical de temperatura de baixa camada. Deverá ser adotada a convenção:
+
+delta_Temp = temperatura_nivel_superior - temperatura_nivel_inferior
+
+CLASSE DE ESTABILIDADE NOTURNA
+
+velocidade < 2,0 m/s: delta_Temp < 0 -> E; delta_Temp >= 0 -> F
+2,0 m/s <= velocidade < 2,5 m/s: delta_Temp < 0 -> D; delta_Temp >= 0 -> E
+velocidade >= 2,5 m/s: delta_Temp < 0 -> D; delta_Temp >= 0 -> D
+
+O SRDT noturno somente deverá ser aplicado quando existir diferença vertical de temperatura representativa e com definição compatível. Caso o cenário inclua período noturno e essa variável não esteja disponível, a inteligência artificial deverá utilizar um método alternativo explicitamente autorizado no arquivo complementar, como o método de Turner quando houver nebulosidade e altura de teto, ou solicitar orientação ao usuário. Não deverão ser inventados valores de delta_Temp.
+
+A classe calculada para um evento permanecerá constante durante toda a vida do respectivo puff, conforme a hipótese simplificadora já definida neste roteiro.
+
+REGISTRO DA PROCEDÊNCIA SEM ALTERAÇÃO DO LAYOUT DO JSON
+
+Nenhum atributo deverá ser acrescentado ou removido do objeto “metadados” ou dos objetos da lista “eventos”.
+
+No modo “sintetico_climatologico_historico”, o atributo “condicoes_meteorologicas”, contido em metadados, deverá registrar de maneira resumida:
+
+Fonte primária e, quando houver, fonte suplementar;
+Período histórico consultado;
+Recorte sazonal utilizado;
+Critério do dia medóide;
+Data do dia histórico selecionado como referência;
+Resolução original e procedimento de reamostragem para delta_t_s;
+Método utilizado para determinar a classe de estabilidade.
+
+Essas informações deverão ser incluídas como texto dentro do paragrafo produzido para compor “condicoes_meteorologicas”, preservando integralmente o layout do JSON estabelecido neste roteiro
+
